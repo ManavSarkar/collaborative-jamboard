@@ -1,15 +1,14 @@
-import Tools from './Tools';
+import Board from './Board';
 import Chatroom from './Chatroom';
 import '../styles/main.css';
 
-function Main()
+function Main(prop)
 {
     return(
 
         <div className="main">
             <div className='main-board'>
-                <Tools />
-                <div className='whiteBoard'>WhiteBoard</div>
+                <Board />
             </div>
             <Chatroom />
         </div>
