@@ -112,10 +112,26 @@ body{
   }
 .pen{
     left: 28%;
+    display: flex;
+    flex-direction: column;
+}
+.pen button{
+    height: 2rem;
+    width: 1.5rem;
+    /* border: 1px solid black; */
+    border-radius: 50%;
+    margin: 10px 5px;
 }
 
 .eraser{
     left: 34%;
+}
+.eraser button{
+    height: 2rem;
+    width: 1.5rem;
+    /* border: 1px solid black; */
+    border-radius: 50%;
+    margin: 10px 5px;
 }
 .shapes{
     left: 40%;

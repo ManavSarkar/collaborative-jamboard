@@ -15,6 +15,12 @@ import {
   faTrash,
   faUndo,
   faUpload,
+  faCircle,
+  faSquare,
+  faRectangleAd,
+  faTriangleCircleSquare,
+  faC,
+
 } from '@fortawesome/free-solid-svg-icons'
 
 function Board() {
@@ -22,6 +28,9 @@ function Board() {
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
   const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
   const [isDropdownOpen4, setIsDropdownOpen4] = useState(false);
+
+  const [selectedColor1, setSelectedColor1] = useState('black');
+  const [selectedColor2, setSelectedColor2] = useState('black');
 
   const [zoomLevel, setZoomLevel] = useState(100);
   const [zoomLevel1, setZoomLevel1] = useState(100);
@@ -48,6 +57,7 @@ function Board() {
   };
 
 
+
   const handleZoomChange1 = (event) => {
     const newZoomLevel = parseInt(event.target.value);
     setZoomLevel1(newZoomLevel);
@@ -66,6 +76,32 @@ function Board() {
     setIsDropdownOpen4(false); // Close the dropdown after selecting zoom option
   };
 
+
+
+  const handleColorChange1 = (color) => {
+    setSelectedColor1(color);
+    setIsDropdownOpen1(false);
+  };
+  const handleColorChange2 = (color) => {
+    setSelectedColor2(color);
+    setIsDropdownOpen2(false);
+  };
+
+
+
+  const deleteBorad = () => {
+    setIsDropdownOpen1(false);
+    setIsDropdownOpen2(false);
+    setIsDropdownOpen3(false);
+    setIsDropdownOpen4(false);
+    setSelectedColor1('black');
+    setSelectedColor2('black');
+    setZoomLevel(100);
+    setZoomLevel1(100);
+    setZoomLevel2(100);
+    setZoomLevel3(100);
+  }
+
   return (
     <div className='board'>
       <div className="tools">
@@ -80,7 +116,7 @@ function Board() {
         </div>
 
         <div className="zoomin">
-          <button type="button" className="pen-tools">
+          <button onClick={toggleDropdown4} type="button" className="pen-tools">
             <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
           </button>
           <button onClick={toggleDropdown4} type="button" className="pen-tools">
@@ -108,7 +144,12 @@ function Board() {
         </div>
 
         <div className="rest-tools">
-          <button onClick={toggleDropdown1} style={{ zoom: `${zoomLevel1}%` }} type="button" className="pen-tools">
+          <button 
+            onClick={toggleDropdown1} 
+            style={{ zoom: `${zoomLevel1}%` , color: selectedColor1}}
+            type="button" 
+            className="pen-tools">
+
             <FontAwesomeIcon icon={faPencil} />
           </button>
           {isDropdownOpen1 && (
@@ -120,10 +161,22 @@ function Board() {
                 value={zoomLevel1}
                 onChange={handleZoomChange1}
               />
+              <div className='colors'>
+                  <button onClick={() => handleColorChange1('black')} style={{ backgroundColor: 'black' }}></button>
+                  <button onClick={() => handleColorChange1('#f5314b')} style={{ backgroundColor: '#f5314b' }}></button>
+                  <button onClick={() => handleColorChange1('cyan')} style={{ backgroundColor: 'cyan' }}></button>
+                  <button onClick={() => handleColorChange1('#31f58c')} style={{ backgroundColor: '#31f58c' }}></button>
+                  <button onClick={() => handleColorChange1('#f5c131')} style={{ backgroundColor: '#f5c131' }}></button>
+                  <button onClick={() => handleColorChange1('#3e31f5')} style={{ backgroundColor: '#3e31f5' }}></button>
+              </div>
             </div>
-            
+      
           )}
-          <button onClick={toggleDropdown2} style={{ zoom: `${zoomLevel2}%` }} type="button" className="pen-tools">
+          <button
+            onClick={toggleDropdown2} 
+            style={{ zoom: `${zoomLevel2}%`, color: selectedColor2 }} 
+            type="button" 
+            className="pen-tools">
             <FontAwesomeIcon icon={faEraser} />
           </button>
           {isDropdownOpen2 && (
@@ -135,6 +188,14 @@ function Board() {
                 value={zoomLevel2}
                 onChange={handleZoomChange2}
               />
+              <div className='colors'>
+                  <button onClick={() => handleColorChange2('black')} style={{ backgroundColor: 'black' }}></button>
+                  <button onClick={() => handleColorChange2('#f5314b')} style={{ backgroundColor: '#f5314b' }}></button>
+                  <button onClick={() => handleColorChange2('cyan')} style={{ backgroundColor: 'cyan' }}></button>
+                  <button onClick={() => handleColorChange2('#31f58c')} style={{ backgroundColor: '#31f58c' }}></button>
+                  <button onClick={() => handleColorChange2('#f5c131')} style={{ backgroundColor: '#f5c131' }}></button>
+                  <button onClick={() => handleColorChange2('#3e31f5')} style={{ backgroundColor: '#3e31f5' }}></button>
+              </div>
             </div>
           )}
           <button onClick={toggleDropdown3} style={{ zoom: `${zoomLevel3}%` }} type="button" className="pen-tools">
@@ -158,7 +219,7 @@ function Board() {
             <FontAwesomeIcon icon={faFont} />
           </button>
 
-          <button type="button" className="pen-tools">
+          <button onClick={deleteBorad} type="button" className="pen-tools">
             <FontAwesomeIcon icon={faTrash} />
           </button>
         </div>
