@@ -174,7 +174,7 @@ function Board() {
           )}
           <button
             onClick={toggleDropdown2} 
-            style={{ zoom: `${zoomLevel2}%`, color: selectedColor2 }} 
+            style={{ zoom: `${zoomLevel2}%` }} 
             type="button" 
             className="pen-tools">
             <FontAwesomeIcon icon={faEraser} />
@@ -188,17 +188,14 @@ function Board() {
                 value={zoomLevel2}
                 onChange={handleZoomChange2}
               />
-              <div className='colors'>
-                  <button onClick={() => handleColorChange2('black')} style={{ backgroundColor: 'black' }}></button>
-                  <button onClick={() => handleColorChange2('#f5314b')} style={{ backgroundColor: '#f5314b' }}></button>
-                  <button onClick={() => handleColorChange2('cyan')} style={{ backgroundColor: 'cyan' }}></button>
-                  <button onClick={() => handleColorChange2('#31f58c')} style={{ backgroundColor: '#31f58c' }}></button>
-                  <button onClick={() => handleColorChange2('#f5c131')} style={{ backgroundColor: '#f5c131' }}></button>
-                  <button onClick={() => handleColorChange2('#3e31f5')} style={{ backgroundColor: '#3e31f5' }}></button>
-              </div>
             </div>
           )}
-          <button onClick={toggleDropdown3} style={{ zoom: `${zoomLevel3}%` }} type="button" className="pen-tools">
+          <button 
+            onClick={toggleDropdown3} 
+            style={{ zoom: `${zoomLevel3}%`, color: selectedColor2 }} 
+            type="button" 
+            className="pen-tools">
+
             <FontAwesomeIcon icon={faShapes} />
           </button>
           {isDropdownOpen3 && (
@@ -210,6 +207,14 @@ function Board() {
                 value={zoomLevel3}
                 onChange={handleZoomChange3}
               />
+              <div className='colors'>
+                  <button onClick={() => handleColorChange2('black')} style={{ backgroundColor: 'black' }}></button>
+                  <button onClick={() => handleColorChange2('#f5314b')} style={{ backgroundColor: '#f5314b' }}></button>
+                  <button onClick={() => handleColorChange2('cyan')} style={{ backgroundColor: 'cyan' }}></button>
+                  <button onClick={() => handleColorChange2('#31f58c')} style={{ backgroundColor: '#31f58c' }}></button>
+                  <button onClick={() => handleColorChange2('#f5c131')} style={{ backgroundColor: '#f5c131' }}></button>
+                  <button onClick={() => handleColorChange2('#3e31f5')} style={{ backgroundColor: '#3e31f5' }}></button>
+              </div>
             </div>
           )}
           <button type="button" className="pen-tools">
