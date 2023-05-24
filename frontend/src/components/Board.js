@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import '../styles/main.css'
+// import '../styles/main.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import {
@@ -15,7 +15,11 @@ import {
   faTrash,
   faUndo,
   faUpload,
+  faDownload,
+  faShare,
 } from '@fortawesome/free-solid-svg-icons'
+
+
 
 function Board() {
   const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
@@ -67,7 +71,7 @@ function Board() {
   };
 
   return (
-    <div className='board'>
+    <div className=' w-full bg-slate-50 min-h-screen mx-2 col-span-2 text-black'>
       <div className="tools">
         <div className="un-redo">
           <button type="button" className="pen-tools ">
@@ -163,8 +167,14 @@ function Board() {
           </button>
         </div>
       </div>
-      <div className='whiteBoard'>
-          <div style={{ zoom: `${zoomLevel}%` }} > Classroom </div>
+      <div className="my-2 h-3/4 border-black border-2 mx-3">
+          <div style={{ zoom: `${zoomLevel}%` }} ></div>
+      </div>
+      <div className="flex justify-center items-center my-4">
+      <button className="btn btn-outline btn-error mx-4 w-36">Leave</button>
+      <button className="btn btn-outline btn-info mx-4 w-40">Download <FontAwesomeIcon icon={faDownload} className='mx-1'/></button>
+      <button className="btn btn-outline btn-success mx-4 w-36">Share <FontAwesomeIcon icon={faShare} className='mx-1'/></button>
+
       </div>
     </div>
   )

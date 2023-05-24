@@ -1,18 +1,14 @@
-import Board from './Board';
-import Chatroom from './Chatroom';
-import '../styles/main.css';
+import Board from "./Board";
+import Chatroom from "./Chatroom";
 
-function Main(prop)
-{
-    return(
+function Main() {
+  return (
+    <div className="grid grid-cols-3 bg-slate-50">
+      <Board />
 
-        <div className="main">
-            <div className='main-board'>
-                <Board />
-            </div>
-            <Chatroom />
-        </div>
-    )
+      <Chatroom />
+    </div>
+  );
 }
 
 export default Main;
