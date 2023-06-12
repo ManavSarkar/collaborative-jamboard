@@ -10,7 +10,9 @@ router.post('/register', async (req, res) => {
     name: req.body.name,
     email: req.body.email.toLowerCase(),
     password: req.body.password,
+
   })
+
 
   var existingUser = await User.findOne({
     email: req.body.email.toLowerCase(),
@@ -32,7 +34,7 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/logout', (req, res) => {
-  res.clearCookie(process.env.AUTH_COOKIE)
+  res.clearCookie("process.env.AUTH_COOKIE")
   res.status(200).json({ success: true })
 })
 
@@ -52,7 +54,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = await user.generateAuthToken()
-    res.cookie(process.env.AUTH_COOKIE, token, {
+    res.cookie("process.env.AUTH_COOKIE", token, {
       expires: new Date(Date.now() + 2592000000),
       httpOnly: true,
     })
