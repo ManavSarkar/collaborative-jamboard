@@ -8,6 +8,7 @@ body{
     font-family: 'Joan', serif;
     font-family: 'Roboto Mono', monospace;
     font-family: 'Roboto Slab', serif;
+    
 }
 .header{
     font-weight: 700;
@@ -16,6 +17,23 @@ body{
     padding-bottom: 10px;
 }
 
+#container {
+    position: relative;
+  }
+  #container canvas, .tools {
+    position: absolute;
+  }
+  
+
+/* .whiteboard {
+    margin-top: 5%;
+    height: 65%;
+    width: 100%;
+    border: 2px solid #000000!important;
+    background-color: #fff;
+    cursor: crosshair;
+  } */
+  
 /* img{
     height: 5%;
     width: 5%;
@@ -23,7 +41,32 @@ body{
 /* .main{
     height: 1000px;
 } */
+/* .whiteboard {
+    border: 1px solid black;
+    cursor: crosshair;
+  } */
+  .whiteboard{
+    height: 100%;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+  }
 
+  /* .colors {
+    position: fixed;
+  }
+  
+  .color {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+  }
+  
+  .color.black { background-color: black; }
+  .color.red { background-color: red; }
+  .color.green { background-color: green; }
+  .color.blue { background-color: blue; }
+  .color.yellow { background-color: yellow; } */
+  
 .main{
     display: flex;
     flex-direction: row;
@@ -41,14 +84,14 @@ body{
     margin: 0 auto;
     width: 80%;
 }
-.whiteBoard{
-    height: 500px;
+/* .whiteBoard{
+    height: 750px;
     width: 95%;
     border: 2px solid black;
-    display: flex;
+    /* display: flex;
     align-items: center;
-    justify-content: center;
-}
+    justify-content: center; 
+}*/
 
 .tools{
     display: flex;
@@ -111,6 +154,7 @@ body{
     width: 200px;
   }
 .pen{
+    top: 100%;
     left: 28%;
     display: flex;
     flex-direction: column;
@@ -124,10 +168,12 @@ body{
 }
 
 .eraser{
+    top: 100%;
     left: 34%;
 }
 
 .shapes{
+    top: 100%;
     left: 40%;
 }
 .shapes button{
@@ -139,9 +185,10 @@ body{
 }
 .zoom{
     /* display: flex; */
+    top: 85%;
     display: flex;
     flex-direction: column;
-    width: 5%;
+    width: 7%;
 }
 .zoom button{
     float: left;
@@ -152,4 +199,8 @@ body{
     width: 50px;
     border: 1px solid black;
     margin: 9px;
+}
+
+.drawing-cursor {
+    cursor: url(../Icons/pencil.png) 0 16, crosshair; /* Replace pen-cursor.png with the path to your custom pen cursor image */
 }
