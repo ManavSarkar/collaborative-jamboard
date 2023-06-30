@@ -27,7 +27,7 @@ function Chatroom() {
     <div className="w-full bg-slate-50 min-h-screen ">
       <div
         className=" bg-slate-50  text-black border-black border-2 my-2  mx-10"
-        style={{ height: '83%' }}
+        style={{ height: '83vh' }}
       >
         <div className={chatRoom === true ? 'hidden' : ''}>
           <Members></Members>

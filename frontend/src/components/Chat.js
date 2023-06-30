@@ -11,7 +11,7 @@ function Chat() {
   const sendMessage = async () => {
     if (currentMessage !== '') {
       const messageData = {
-        author: socket.id.toString(),
+        author: socket.id ? socket.id.toString() : 'unknown',
         message: currentMessage,
         date:
           new Date(Date.now()).getHours() +
@@ -33,54 +33,42 @@ function Chat() {
   }, [socket])
 
   return (
-    <div className="max-w-lg mx-auto " style={{ height: '83%' }}>
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-800">Chat</h2>
-        </div>
-        <div className="px-6 py-4">
-          <ul className="space-y-4">
-            {/* Message List */}
-            {messageList.map((message, index) => (
-              <li
-                className={
-                  'chat' +
-                  (message.author === socket.id ? 'chat-end' : ' chat-start')
-                }
-                key={index}
-              >
-                <div className="flex-shrink-0">
-                  <img
-                    className="w-10 h-10 rounded-full"
-                    src={message.author}
-                    alt={message.author}
-                  />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-900">
-                    {message.author.name}
-                  </p>
-                  <p className="text-sm text-gray-700">{message.message}</p>
-                  <p className="text-xs text-gray-500">{message.date}</p>
-                </div>
-              </li>
+    <div className="" style={{ height: '83vh' }}>
+      <div className="flex flex-col h-full">
+        <header className="py-2 px-4 bg-gray-800 text-white">
+          <h1 className="text-lg font-semibold">Chat Header</h1>
+        </header>
+
+        <div className="flex-grow overflow-y-auto">
+          <div className="flex flex-col space-y-2 p-4">
+            {messageList.map((message) => (
+              <div key={message.id} className="bg-white p-4 rounded-lg">
+                <p className="text-gray-800 font-medium mb-1">
+                  {message.author}
+                </p>
+                <p className="text-gray-600">{message.message}</p>
+                <p className="text-gray-500 text-xs mt-2">{message.date}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
-        <div className="px-6 py-4 bg-gray-100">
-          <div className="flex space-x-3">
+
+        <div className="py-4 px-4">
+          <div className="flex">
             <input
-              className="flex-grow border border-gray-300 rounded-md py-2 px-4"
               type="text"
-              placeholder="Type a message..."
+              className="flex-grow px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:border-blue-500"
+              placeholder="Type your message..."
               value={currentMessage}
-              onChange={(event) => setCurrentMessage(event.target.value)}
-              onKeyPress={(event) =>
-                event.key === 'Enter' ? sendMessage() : null
-              }
+              onChange={(event) => {
+                setCurrentMessage(event.target.value)
+              }}
+              onKeyPress={(event) => {
+                event.key === 'Enter' && sendMessage()
+              }}
             />
             <button
-              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+              className="px-4 py-2 bg-blue-500 text-white rounded-r-lg ml-2"
               onClick={sendMessage}
             >
               Send
