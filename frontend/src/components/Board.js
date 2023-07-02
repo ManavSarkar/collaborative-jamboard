@@ -148,7 +148,7 @@ function Board() {
 
       context.moveTo(x0, y0)
       context.lineTo(x1, y1)
-      context.strokeStyle = colorPen
+      context.strokeStyle = color
       context.lineWidth = 2 * (zoomval / 100)
       context.stroke()
       context.closePath()
@@ -185,7 +185,7 @@ function Board() {
         current.y,
         e.clientX || e.touches[0].clientX,
         e.clientY || e.touches[0].clientY,
-        current.color,
+        colorPen,
         true,
       )
       current.x = e.clientX || e.touches[0].clientX
@@ -202,7 +202,7 @@ function Board() {
         current.y,
         e.clientX || e.touches[0].clientX,
         e.clientY || e.touches[0].clientY,
-        current.color,
+        colorPen,
         true,
       )
     }
