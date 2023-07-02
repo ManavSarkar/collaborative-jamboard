@@ -143,13 +143,13 @@ function Board() {
 
     // ------------------------------- create the drawing ----------------------------
     console.log(colorPen)
-    const drawLine = (x0, y0, x1, y1, color, emit) => {
+    const drawLine = (x0, y0, x1, y1, color, size, emit) => {
       context.beginPath()
 
       context.moveTo(x0, y0)
       context.lineTo(x1, y1)
       context.strokeStyle = color
-      context.lineWidth = 2 * (zoomval / 100)
+      context.lineWidth = 2 * (size / 100)
       context.stroke()
       context.closePath()
 
@@ -165,6 +165,7 @@ function Board() {
         x1: x1 / w,
         y1: y1 / h,
         color,
+        size,
       })
     }
 
@@ -186,6 +187,7 @@ function Board() {
         e.clientX || e.touches[0].clientX,
         e.clientY || e.touches[0].clientY,
         colorPen,
+        zoomval,
         true,
       )
       current.x = e.clientX || e.touches[0].clientX
@@ -203,6 +205,7 @@ function Board() {
         e.clientX || e.touches[0].clientX,
         e.clientY || e.touches[0].clientY,
         colorPen,
+        zoomval,
         true,
       )
     }
@@ -248,7 +251,15 @@ function Board() {
     const onDrawingEvent = (data) => {
       const w = canvas.width
       const h = canvas.height
-      drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color)
+      console.log(data, 'the data')
+      drawLine(
+        data.x0 * w,
+        data.y0 * h,
+        data.x1 * w,
+        data.y1 * h,
+        data.color,
+        data.size,
+      )
     }
 
     socketRef.current = io.connect('http://localhost:8080')
