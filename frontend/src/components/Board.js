@@ -348,16 +348,44 @@ function Board() {
     const onDrawingEvent = (data) => {
       const w = canvas.width
       const h = canvas.height
-      console.log(data, 'the data')
 
-      drawLine(
-        data.x0 * w,
-        data.y0 * h,
-        data.x1 * w,
-        data.y1 * h,
-        data.color,
-        data.size,
-      )
+      if (data.shape === 'pen' || data.shape === 'eraser') {
+        drawLine(
+          data.x0 * w,
+          data.y0 * h,
+          data.x1 * w,
+          data.y1 * h,
+          data.color,
+          data.size,
+        )
+      } else if (data.shape === 'line') {
+        drawLine(
+          data.x0 * w,
+          data.y0 * h,
+          data.x1 * w,
+          data.y1 * h,
+          data.color,
+          data.size,
+        )
+      } else if (data.shape === 'rectangle') {
+        drawRectangle(
+          data.x0 * w,
+          data.y0 * h,
+          data.x1 * w,
+          data.y1 * h,
+          data.color,
+          data.size,
+        )
+      } else if (data.shape === 'circle') {
+        drawCircle(
+          data.x0 * w,
+          data.y0 * h,
+          data.x1 * w,
+          data.y1 * h,
+          data.color,
+          data.size,
+        )
+      }
     }
 
     socketRef.current = io.connect('http://localhost:8080')
