@@ -349,6 +349,7 @@ function Board() {
       const w = canvas.width
       const h = canvas.height
       console.log(data, 'the data')
+
       drawLine(
         data.x0 * w,
         data.y0 * h,
@@ -447,6 +448,7 @@ function Board() {
                   max="200"
                   value={zoomLevel1}
                   onChange={handleZoomChange1}
+                  id="penWidth"
                 />
                 <div className="colors">
                   <button
@@ -514,6 +516,8 @@ function Board() {
                 <button
                   onClick={() => {
                     shapeDr = 'line'
+                    colorPen = colorPen === 'white' ? 'black' : colorPen
+                    zoomval = 100
                     setCurrentShape('line')
                   }}
                 >
@@ -529,6 +533,8 @@ function Board() {
                 <button
                   onClick={() => {
                     shapeDr = 'rectangle'
+                    colorPen = colorPen === 'white' ? 'black' : colorPen
+                    zoomval = 100
                     setCurrentShape('rectangle')
                   }}
                 >
@@ -543,8 +549,9 @@ function Board() {
                 </button>
                 <button
                   onClick={() => {
-                    console.log(currentShape)
                     shapeDr = 'circle'
+                    colorPen = colorPen === 'white' ? 'black' : colorPen
+                    zoomval = 100
                     setCurrentShape('circle')
                   }}
                 >
