@@ -9,15 +9,15 @@ const VoiceChat = () => {
   const remoteAudioRef = useRef(null);
   const [audioStreams, setAudioStreams] = useState(new Map());
   const [connections, setConnections] = useState([]);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const myStreamRef = useRef(null);
+
   useEffect(() => {
     let userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
-    let myStream = null;
+
     userMedia
       .then((stream) => {
         myStreamRef.current = stream;
-        myStream = stream;
       })
       .catch((err) => {
         console.log(err);
@@ -29,26 +29,27 @@ const VoiceChat = () => {
     peer.on("open", (id) => {
       console.log("My peer ID is: " + id);
       socket.emit("user-add", { peerID: peer.id });
+      peerRef.current = peer;
     });
     peer.on("call", (call) => {
-      call.answer(myStream);
+      call.answer(myStreamRef.current);
     });
-    peerRef.current = peer;
 
     socket.on("connected-users", (users) => {
       console.log("connected-users", users);
       users.forEach((user) => {
-        connectToNewUser(user["socketID"], user["peerID"], myStream);
+        connectToNewUser(user["socketID"], user["peerID"]);
       });
     });
 
     socket.on("user-joined", (user) => {
-      connectToNewUser(user["socketID"], user["peerID"], myStream);
+      connectToNewUser(user["socketID"], user["peerID"]);
     });
   }, []);
 
-  const connectToNewUser = (socketID, peerID, myStream) => {
-    const call = peerRef.current.call(peerID, myStream);
+  const connectToNewUser = (socketID, peerID) => {
+    if (peerRef.current == null || peerRef.current.id === peerID) return;
+    const call = peerRef.current.call(peerID, myStreamRef.current);
     if (call === undefined) return;
     call.on("stream", (remoteStream) => {
       remoteAudioRef.current.srcObject = remoteStream;
@@ -60,12 +61,14 @@ const VoiceChat = () => {
   const handleMute = () => {
     myStreamRef.current.getAudioTracks()[0].enabled =
       !myStreamRef.current.getAudioTracks()[0].enabled;
+
+    alert(myStreamRef.current.getAudioTracks()[0].enabled);
     setMuted(!muted);
   };
   return (
     <div
       className={
-        "btn btn-error mx-4 w-40" + (muted ? " btn-active" : " btn-outline")
+        "btn btn-outline mx-4 w-40" + (muted ? " btn-error " : " btn-success")
       }
       onClick={handleMute}
     >
