@@ -3,7 +3,6 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Joan&family=Roboto+Mono:wght@300&family=Roboto+Slab:wght@300&display=swap');
 
-
 body{
     font-family: 'Joan', serif;
     font-family: 'Roboto Mono', monospace;
@@ -49,6 +48,7 @@ body{
     height: 100%;
     width: 100%;
     background-color: rgb(255, 255, 255);
+    cursor: url('pencil2.png') -12 6, auto;
   }
 
   /* .colors {
@@ -71,6 +71,7 @@ body{
     display: flex;
     flex-direction: row;
 }
+
 .chatroom{
     width: 20%;
     /* margin-left: auto; */
