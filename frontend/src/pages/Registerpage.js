@@ -1,8 +1,8 @@
-// import { Alert } from '@mui/material';
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { REGISTER_URL } from "../constants";
 
 function Registerpage() {
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ function Registerpage() {
       // alert("password not matching")
       return;
     }
-    fetch("http://localhost:5000/api/user/register", {
+    fetch(REGISTER_URL, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -28,11 +28,12 @@ function Registerpage() {
 
         toast.success("Registration Successful");
         setTimeout(() => {
-          navigate("/");
+          navigate("/login");
         }, 1000);
       })
       .catch((err) => {
         toast.error("Registration Unsuccessful");
+        toast.error(err.toString());
         // console.log(err);
       });
   };
@@ -54,7 +55,7 @@ function Registerpage() {
                     type="text"
                     placeholder="Name"
                     className="input input-bordered w-full max-w-xs bg-slate-100 my-2 mx-2 text-black"
-                    {...register("firstname")}
+                    {...register("name")}
                   />
                   <input
                     type="text"
@@ -75,9 +76,12 @@ function Registerpage() {
                     {...register("cpassword")}
                   />
                   <div className="card-actions max-w-full flex items-center justify-around pt-10">
-                    <a className="link link-primary" href="/">
+                    <button
+                      className="link link-primary"
+                      onClick={() => navigate("/login")}
+                    >
                       Already Registered ? Login Here
-                    </a>
+                    </button>
 
                     <button type="submit" className="btn btn-primary my-2">
                       Register

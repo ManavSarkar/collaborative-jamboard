@@ -1,47 +1,60 @@
 // import React from 'react'
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css'
+import "react-toastify/dist/ReactToastify.css";
+import { LOGIN_URL } from "../constants";
+import Utils from "../utils";
 
 function Loginpage() {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
   const postLogin = (data) => {
-    fetch("http://localhost:5000/api/user/login", {
+    fetch(LOGIN_URL, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
       },
       body: JSON.stringify(data),
+      credentials: "include",
     })
       .then((response) => {
         return response.json();
       })
       .then((result) => {
         // console.log(result);
-        toast.success("Login Successful")
+        if (result.success !== true) {
+          toast.error("Invalid Credentials");
+          return;
+        }
+        toast.success("Login Successful");
         setTimeout(() => {
-          navigate("/profile", {
-          });
+          navigate("/");
         }, 1000);
-       
       })
       .catch((err) => {
         // console.log(err);
-        toast.error("Invalid Credentials")
+        toast.error("Invalid Credentials");
       });
   };
 
   const onSubmit = (data) => {
     postLogin(data);
   };
-
+  const checkLoggedIn = async () => {
+    let loggedIn = new Utils().checkLogin();
+    if (loggedIn) {
+      navigate("/");
+    }
+  };
+  useEffect(() => {
+    checkLoggedIn();
+  }, []);
   return (
     <>
       <div className="flex justify-end">
-        <ToastContainer/>
+        <ToastContainer />
       </div>
       {/* </div> */}
       <div className="w-full min-h-screen bg-slate-200 flex justify-center items-center">
@@ -53,7 +66,7 @@ function Loginpage() {
             <div className="card card-compact flex bg-slate-50 w-96 shadw-xl ">
               <div className="card-body">
                 <input
-                  type="text"
+                  type="email"
                   placeholder="email"
                   className="input input-bordered w-full max-w-xs bg-slate-50 my-2 mx-2 text-black"
                   {...register("email")}

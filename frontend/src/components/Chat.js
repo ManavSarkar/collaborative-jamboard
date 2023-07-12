@@ -1,39 +1,39 @@
-import React, { useEffect, useLayoutEffect, useState, useRef } from 'react'
-import { useMemo } from 'react'
+import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
+import { useMemo } from "react";
 
-import io from 'socket.io-client'
+import io from "socket.io-client";
 
-const socket = io.connect('http://localhost:8080')
+const socket = io.connect("http://localhost:5000/chating");
 
 function Chat() {
-  const [currentMessage, setCurrentMessage] = useState('')
-  const [messageList, setMessageList] = useState([])
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [messageList, setMessageList] = useState([]);
   const sendMessage = async () => {
-    if (currentMessage !== '') {
+    if (currentMessage !== "") {
       const messageData = {
-        author: socket.id ? socket.id.toString() : 'unknown',
+        author: socket.id ? socket.id.toString() : "unknown",
         message: currentMessage,
         date:
           new Date(Date.now()).getHours() +
-          ':' +
+          ":" +
           new Date(Date.now()).getMinutes() +
-          ':' +
+          ":" +
           new Date(Date.now()).getSeconds(),
-      }
-      await socket.emit('send_message', messageData)
-      setMessageList((list) => [...list, messageData])
-      setCurrentMessage('')
+      };
+      await socket.emit("send_message", messageData);
+      setMessageList((list) => [...list, messageData]);
+      setCurrentMessage("");
     }
-  }
+  };
 
   useMemo(() => {
-    socket.on('receive_message', (data) => {
-      setMessageList((list) => [...list, data])
-    })
-  }, [socket])
+    socket.on("receive_message", (data) => {
+      setMessageList((list) => [...list, data]);
+    });
+  }, [socket]);
 
   return (
-    <div className="" style={{ height: '83vh' }}>
+    <div className="" style={{ height: "83vh" }}>
       <div className="flex flex-col h-full">
         <header className="py-2 px-4 bg-gray-800 text-white">
           <h1 className="text-lg font-semibold">Chat Header</h1>
@@ -61,10 +61,10 @@ function Chat() {
               placeholder="Type your message..."
               value={currentMessage}
               onChange={(event) => {
-                setCurrentMessage(event.target.value)
+                setCurrentMessage(event.target.value);
               }}
               onKeyPress={(event) => {
-                event.key === 'Enter' && sendMessage()
+                event.key === "Enter" && sendMessage();
               }}
             />
             <button
@@ -77,7 +77,7 @@ function Chat() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Chat
+export default Chat;
