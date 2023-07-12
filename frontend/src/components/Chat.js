@@ -1,11 +1,7 @@
 import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { useMemo } from "react";
 
-import io from "socket.io-client";
-
-const socket = io.connect("http://localhost:5000/chating");
-
-function Chat() {
+function Chat({ socket }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
   const sendMessage = async () => {

@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import Peer from "peerjs";
-import io from "socket.io-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
-const VoiceChat = () => {
+import { useParams } from "react-router-dom";
+const VoiceChat = ({ socket }) => {
   const [remotePeerID, setRemotePeerID] = useState("");
   const peerRef = useRef(null);
   const remoteAudioRef = useRef(null);
@@ -11,7 +11,7 @@ const VoiceChat = () => {
   const [connections, setConnections] = useState([]);
   const [muted, setMuted] = useState(false);
   const myStreamRef = useRef(null);
-
+  const params = useParams();
   useEffect(() => {
     let userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -24,11 +24,10 @@ const VoiceChat = () => {
       });
 
     const peer = new Peer();
-    const socket = io.connect("http://localhost:5000");
 
     peer.on("open", (id) => {
       console.log("My peer ID is: " + id);
-      socket.emit("user-add", { peerID: peer.id });
+      socket.emit("user-add", { peerID: peer.id, roomID: params.id });
       peerRef.current = peer;
     });
     peer.on("call", (call) => {

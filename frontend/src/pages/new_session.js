@@ -1,12 +1,27 @@
 import React from "react";
 import Utils from "../utils";
 import { useNavigate } from "react-router-dom";
+import { CREATE_SESSION_URL } from "../constants";
 
 const NewSessionPage = () => {
   const navigator = useNavigate();
   const createSession = (e) => {
     e.preventDefault();
-    console.log("createSessionPage");
+    const title = e.target[0].value;
+    fetch(CREATE_SESSION_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        // navigate to session page with id and title as query params
+        navigator(`/session/${data.id}?title=${data.title}`);
+      })
+      .catch((err) => console.log(err));
   };
   const checkLoggedIn = async () => {
     const utils = new Utils();

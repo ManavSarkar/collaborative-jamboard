@@ -4,7 +4,7 @@ import Loginpage from "./pages/Loginpage";
 import Registerpage from "./pages/Registerpage";
 import PageNotFound from "./pages/PageNotFound";
 import "./app.css";
-import Main from "./components/Main";
+import Session from "./pages/Main";
 import Header from "./components/Header";
 import Profile from "./pages/Profile";
 import HomePage from "./pages/Homepage";
@@ -22,6 +22,7 @@ function App() {
         <Route path="/register" element={<Registerpage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/new-session" element={<NewSessionPage />} />
+        <Route path="/session/:id" element={<Session />} />
       </Routes>
     </BrowserRouter>
   );

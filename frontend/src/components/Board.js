@@ -1,9 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import "../styles/main.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import whiteBoard from './whiteBoard'
-
-import io from "socket.io-client";
 
 import {
   faCaretDown,
@@ -32,7 +29,7 @@ import VoiceChat from "./VoiceChat";
 var colorPen = "black",
   zoomval = 100;
 let shapeDr = "pen";
-function Board() {
+function Board({ socket }) {
   const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
   const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
@@ -124,7 +121,6 @@ function Board() {
 
   const canvasRef = useRef(null);
   const colorsRef = useRef(null);
-  const socketRef = useRef();
   const bsize = useRef(null);
 
   useEffect(() => {
@@ -173,7 +169,7 @@ function Board() {
       const w = canvas.width;
       const h = canvas.height;
 
-      socketRef.current.emit("drawing", {
+      socket.emit("drawing", {
         x0: x0 / w,
         y0: y0 / h,
         x1: x1 / w,
@@ -194,7 +190,7 @@ function Board() {
       const h = canvas.height;
 
       if (emit) {
-        socketRef.current.emit("drawing", {
+        socket.emit("drawing", {
           x0: x0 / w,
           y0: y0 / h,
           x1: x1 / w,
@@ -217,7 +213,7 @@ function Board() {
       const w = canvas.width;
       const h = canvas.height;
       if (emit) {
-        socketRef.current.emit("drawing", {
+        socket.emit("drawing", {
           x0: x0 / w,
           y0: y0 / h,
           x1: x1 / w,
@@ -389,11 +385,7 @@ function Board() {
         );
       }
     };
-
-    socketRef.current = io.connect(
-      "http://localhost:5000/api/jamboard/jamboard"
-    );
-    socketRef.current.on("drawing", onDrawingEvent);
+    socket.on("drawing", onDrawingEvent);
   }, []);
 
   return (
@@ -634,7 +626,7 @@ function Board() {
 
       <div className="flex justify-center items-center my-4">
         <button className="btn btn-outline btn-error mx-4 w-36">Leave</button>
-        <VoiceChat />
+        <VoiceChat socket={socket} />
         <button className="btn btn-outline btn-info mx-4 w-40">
           Download <FontAwesomeIcon icon={faDownload} className="mx-1" />
         </button>
