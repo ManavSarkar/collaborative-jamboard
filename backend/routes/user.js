@@ -60,7 +60,6 @@ router.post("/login", async (req, res) => {
       expires: new Date(Date.now() + 2592000000),
       httpOnly: true,
     });
-    console.log(token);
     res.json({ success: true });
   } catch (error) {
     // Handle any potential errors
@@ -70,6 +69,6 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/checkloggedin", authenticate, (req, res) => {
-  res.json({ success: true });
+  res.json({ success: true, user: req.user });
 });
 module.exports = router;

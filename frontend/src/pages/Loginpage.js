@@ -43,8 +43,8 @@ function Loginpage() {
     postLogin(data);
   };
   const checkLoggedIn = async () => {
-    let loggedIn = new Utils().checkLogin();
-    if (loggedIn) {
+    let loggedIn = await new Utils().checkLogin();
+    if (loggedIn[0]) {
       navigate("/");
     }
   };

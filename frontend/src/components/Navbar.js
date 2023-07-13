@@ -20,7 +20,7 @@ const Navbar = () => {
   const checkLoggedIn = async () => {
     const utils = new Utils();
     let res = await utils.checkLogin();
-    setLoggedIn(res);
+    setLoggedIn(res[0]);
   };
 
   const handleNewSessionButtonPressed = () => {

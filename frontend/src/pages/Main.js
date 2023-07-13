@@ -4,21 +4,43 @@ import Chatroom from "../components/Chatroom";
 
 import io from "socket.io-client";
 import { useEffect, useState } from "react";
+import Utils from "../utils";
 function Session() {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const socket = io.connect("http://localhost:5000/");
   const [loading, setLoading] = useState(true);
-  // useEffect(() => {}, []);
-  const sessionID = params.id;
-  const title = searchParams.get("title");
-  socket.on("connect", () => {
-    console.log("connected");
-  });
-  socket.emit("join-session", { sessionID: sessionID, title: title });
-  socket.on("joined-session", () => {
-    setLoading(false);
-  });
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const getUser = async () => {
+    let res = await new Utils().checkLogin();
+    if (res[0]) {
+      setUser(res[1]);
+      joinSession(res[1]);
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const joinSession = (user) => {
+    const sessionID = params.id;
+    const title = searchParams.get("title");
+
+    socket.emit("join-session", {
+      sessionID: sessionID,
+      title: title,
+      userDetails: {
+        name: user.name,
+        email: user.email,
+      },
+    });
+    socket.on("joined-session", () => {
+      setLoading(false);
+    });
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
   if (loading) {
     return (
       <div>

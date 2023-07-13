@@ -11,11 +11,10 @@ export default class Utils {
       credentials: "include",
     });
     if (res.status !== 200) {
-      return false;
+      return [false, null];
     } else {
-      //   res = await res.json();
-      return true;
+      res = await res.json();
+      return [true, res.user];
     }
-    return true;
   };
 }

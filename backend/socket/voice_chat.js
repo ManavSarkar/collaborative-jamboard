@@ -3,7 +3,7 @@ module.exports = voiceChatSocket = async (io) => {
   io.on("connection", (socket) => {
     socket.on("user-add", (data) => {
       const roomID = data.roomID;
-      console.log("user-add", roomID, socket.id, data.peerID);
+      // console.log("user-add", roomID, socket.id, data.peerID);
       // userPeerIDs.set(socket.id, data.peerID);
       let room = userPeerIDs.get(roomID);
       if (room) {
@@ -34,7 +34,6 @@ module.exports = voiceChatSocket = async (io) => {
     // );
 
     socket.on("disconnect", () => {
-      console.log("user-left", socket.id);
       socket.broadcast.emit("user-left", socket.id);
       userPeerIDs.delete(socket.id);
     });

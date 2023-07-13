@@ -25,11 +25,14 @@ import {
   faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
 import VoiceChat from "./VoiceChat";
+import { useParams } from "react-router-dom";
 
 var colorPen = "black",
   zoomval = 100;
 let shapeDr = "pen";
 function Board({ socket }) {
+  const params = useParams();
+  const roomID = params.id;
   const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
   const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
@@ -177,6 +180,7 @@ function Board({ socket }) {
         color,
         size,
         shape: shapeDr,
+        roomID: roomID,
       });
     };
 
@@ -198,6 +202,7 @@ function Board({ socket }) {
           color,
           size,
           shape: shapeDr,
+          roomID: roomID,
         });
       }
     };
@@ -221,6 +226,7 @@ function Board({ socket }) {
           color,
           size,
           shape: shapeDr,
+          roomID: roomID,
         });
       }
     };
@@ -254,8 +260,12 @@ function Board({ socket }) {
       current.x = e.clientX || e.touches[0].clientX;
       current.y = e.clientY || e.touches[0].clientY;
     };
-
+    const saveCanvasData = () => {
+      const data = context.getImageData(0, 0, canvas.width, canvas.height);
+      console.log(data);
+    };
     const onMouseUp = (e) => {
+      saveCanvasData();
       console.log(shapeDr);
       if (!drawing) {
         return;
@@ -344,6 +354,7 @@ function Board({ socket }) {
 
     // ----------------------- socket.io connection ----------------------------
     const onDrawingEvent = (data) => {
+      if (data.roomID !== roomID) return;
       const w = canvas.width;
       const h = canvas.height;
 
@@ -385,7 +396,8 @@ function Board({ socket }) {
         );
       }
     };
-    socket.on("drawing", onDrawingEvent);
+
+    socket.on("boardDrawing", onDrawingEvent);
   }, []);
 
   return (

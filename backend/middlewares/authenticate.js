@@ -3,7 +3,6 @@ const User = require("../models/user_model");
 const Authenticate = async (req, res, next) => {
   try {
     const token = req.cookies["auth_cookie"];
-    console.log(token);
     const verify = jwt.verify(token, "process.env.SECRET_KEY");
     const rootUser = await User.findById({ _id: verify._id });
     if (rootUser === null) {
