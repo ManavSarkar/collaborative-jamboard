@@ -1,16 +1,19 @@
 import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
-
+import Utils from "./../utils";
+import Avatar from "react-avatar";
 function Chat({ socket }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
   const params = useParams();
   const roomID = params.id;
+  const [user, setUser] = useState(null);
   const sendMessage = async () => {
     if (currentMessage !== "") {
       const messageData = {
-        author: socket.id ? socket.id.toString() : "unknown",
+        author: user.name,
+
         message: currentMessage,
         roomID: roomID,
         date:
@@ -25,7 +28,16 @@ function Chat({ socket }) {
       setCurrentMessage("");
     }
   };
-
+  const getUser = async () => {
+    let utils = new Utils();
+    let res = await utils.checkLogin();
+    if (res[0]) {
+      setUser(res[1]);
+    }
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
   useMemo(() => {
     socket.on("receive_message", (data) => {
       if (data.roomID !== roomID) return;
@@ -43,12 +55,22 @@ function Chat({ socket }) {
         <div className="flex-grow overflow-y-auto">
           <div className="flex flex-col space-y-2 p-4">
             {messageList.map((message) => (
-              <div key={message.id} className="bg-white p-4 rounded-lg">
-                <p className="text-gray-800 font-medium mb-1">
-                  {message.author}
-                </p>
-                <p className="text-gray-600">{message.message}</p>
-                <p className="text-gray-500 text-xs mt-2">{message.date}</p>
+              <div key={message.id} className="bg-white p-4 rounded-lg flex">
+                <Avatar
+                  name={message.author}
+                  size={50}
+                  round="32px"
+                  className="mx-3"
+                ></Avatar>
+                <div>
+                  <p className="text-black-600 font-bold mx-2">
+                    {message.author}
+                  </p>
+                  <p className="text-gray-600 mx-2">{message.message}</p>
+                  <p className="text-gray-500 text-xs mt-2 mx-2">
+                    {message.date}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
