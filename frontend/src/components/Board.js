@@ -110,21 +110,10 @@ function Board({ socket }) {
     setIsDropdownOpen1(false);
   };
 
-  const deleteBorad = () => {
-    setIsDropdownOpen1(false);
-    setIsDropdownOpen2(false);
-    setIsDropdownOpen3(false);
-    setIsDropdownOpen4(false);
-    setSelectedColor1("black");
-    setZoomLevel(100);
-    setZoomLevel1(100);
-    setZoomLevel2(100);
-    setZoomLevel3(100);
-  };
-
   const canvasRef = useRef(null);
   const colorsRef = useRef(null);
   const bsize = useRef(null);
+  const clearCanvasButtonRef = useRef(null);
 
   useEffect(() => {
     // --------------- getContext() method returns a drawing context on the canvas-----
@@ -231,6 +220,24 @@ function Board({ socket }) {
       }
     };
 
+    const clearCanvas = (emit) => {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      setIsDropdownOpen1(false);
+      setIsDropdownOpen2(false);
+      setIsDropdownOpen3(false);
+      setIsDropdownOpen4(false);
+      setSelectedColor1("black");
+      setZoomLevel(100);
+      setZoomLevel1(100);
+      setZoomLevel2(100);
+      setZoomLevel3(100);
+      if (emit) {
+        socket.emit("clearCanvas", { roomID: roomID });
+      }
+    };
+    clearCanvasButtonRef.current.addEventListener("click", () =>
+      clearCanvas(true)
+    );
     // ---------------- mouse movement --------------------------------------
 
     const onMouseDown = (e) => {
@@ -398,6 +405,9 @@ function Board({ socket }) {
     };
 
     socket.on("boardDrawing", onDrawingEvent);
+    socket.on("clearCanvasListen", (data) => {
+      if (data === roomID) clearCanvas(false);
+    });
   }, []);
 
   return (
@@ -416,8 +426,8 @@ function Board({ socket }) {
           className="whiteboard "
         />
 
-        <div className="tools">
-          <div className="un-redo">
+        <div className="tools flex justify-center">
+          {/* <div className="un-redo">
             <button type="button" className="pen-tools ">
               <FontAwesomeIcon icon={faUndo} />
             </button>
@@ -450,9 +460,9 @@ function Board({ socket }) {
                 <button onClick={() => handleZoomIn(200)}>200%</button>
               </div>
             )}
-          </div>
+          </div> */}
 
-          <div className="pages">
+          {/* <div className="pages">
             <button type="button" className="pen-tools">
               <FontAwesomeIcon icon={faCaretLeft} />
             </button>
@@ -460,7 +470,7 @@ function Board({ socket }) {
             <button type="button" className="pen-tools">
               <FontAwesomeIcon icon={faCaretRight} />
             </button>
-          </div>
+          </div> */}
 
           <div className="rest-tools">
             <button
@@ -602,14 +612,18 @@ function Board({ socket }) {
                 </button>
               </div>
             )}
-            <button type="button" className="pen-tools">
+            {/* <button type="button" className="pen-tools">
               <FontAwesomeIcon icon={faUpload} />
             </button>
             <button type="button" className="pen-tools">
               <FontAwesomeIcon icon={faFont} />
-            </button>
+            </button> */}
 
-            <button onClick={deleteBorad} type="button" className="pen-tools">
+            <button
+              ref={clearCanvasButtonRef}
+              type="button"
+              className="pen-tools"
+            >
               <FontAwesomeIcon icon={faTrash} />
             </button>
           </div>

@@ -1,14 +1,18 @@
 import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { useMemo } from "react";
+import { useParams } from "react-router-dom";
 
 function Chat({ socket }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
+  const params = useParams();
+  const roomID = params.id;
   const sendMessage = async () => {
     if (currentMessage !== "") {
       const messageData = {
         author: socket.id ? socket.id.toString() : "unknown",
         message: currentMessage,
+        roomID: roomID,
         date:
           new Date(Date.now()).getHours() +
           ":" +
@@ -24,6 +28,7 @@ function Chat({ socket }) {
 
   useMemo(() => {
     socket.on("receive_message", (data) => {
+      if (data.roomID !== roomID) return;
       setMessageList((list) => [...list, data]);
     });
   }, [socket]);

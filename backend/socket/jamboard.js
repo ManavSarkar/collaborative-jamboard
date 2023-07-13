@@ -5,6 +5,9 @@ module.exports = jamboardSocket = async (io) => {
     socket.on("drawing", (data) => {
       socket.broadcast.emit("boardDrawing", data);
     });
+    socket.on("clearCanvas", (data) => {
+      socket.broadcast.emit("clearCanvasListen", data);
+    });
     socket.on("join-session", (data) => {
       socket.join(data.sessionID);
       membersRoom.set(socket.id, data.sessionID);
@@ -32,8 +35,8 @@ module.exports = jamboardSocket = async (io) => {
             room.splice(index, 1);
             joinedMembersDetails[roomID] = room;
           }
+          socket.emit("joined-members-list", room);
         }
-        socket.emit("joined-members-list", joinedMembersDetails[roomID]);
       }
       membersRoom.delete(socket.id);
     });
