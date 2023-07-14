@@ -4,28 +4,26 @@ import Loginpage from "./pages/Loginpage";
 import Registerpage from "./pages/Registerpage";
 import PageNotFound from "./pages/PageNotFound";
 import "./app.css";
-import Main from "./components/Main";
+import Session from "./pages/Main";
 import Header from "./components/Header";
 import Profile from "./pages/Profile";
-
+import HomePage from "./pages/Homepage";
+import Navbar from "./components/Navbar";
+import NewSessionPage from "./pages/new_session";
 
 function App() {
-
-  
-
-
   return (
     <BrowserRouter>
-      {/* <Routes>
-        <Route path="/" element={<Loginpage />}></Route>
-        <Route path="/login" element={<Loginpage />}></Route>
-        <Route path="/profile" element={<Profile />}></Route>
-        <Route path="/register" element={<Registerpage />}></Route>
-        <Route path="/*" element={<PageNotFound />}></Route>
-      </Routes> */}
-      {/* <Header /> */}
-      <Main />
-      {/* <Whiteboard /> */}
+      <Navbar />
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Loginpage />} />
+        <Route path="/register" element={<Registerpage />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/new-session" element={<NewSessionPage />} />
+        <Route path="/session/:id" element={<Session />} />
+      </Routes>
     </BrowserRouter>
   );
 }

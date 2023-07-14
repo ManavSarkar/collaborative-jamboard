@@ -1,37 +1,44 @@
-const express = require('express')
-const app = express()
-const http = require('http')
-const cors = require('cors')
-app.use(
-  cors({
-    origin: '*',
-    methods: ['GET', 'POST'],
-  }),
-)
+module.exports = jamboardSocket = async (io) => {
+  let joinedMembersDetails = new Map();
+  let membersRoom = new Map();
+  io.on("connection", (socket) => {
+    socket.on("drawing", (data) => {
+      socket.broadcast.emit("boardDrawing", data);
+    });
+    socket.on("clearCanvas", (data) => {
+      socket.broadcast.emit("clearCanvasListen", data);
+    });
+    socket.on("join-session", (data) => {
+      socket.join(data.sessionID);
+      membersRoom.set(socket.id, data.sessionID);
+      // add socket id to data
+      data.userDetails.socketID = socket.id;
+      if (joinedMembersDetails[data.sessionID]) {
+        joinedMembersDetails[data.sessionID].push(data.userDetails);
+      } else {
+        joinedMembersDetails[data.sessionID] = [data.userDetails];
+      }
 
-const server = http.createServer(app)
+      io.to(data.sessionID).emit("joined-session");
+    });
+    socket.on("get-joined-members", (data) => {
+      socket.emit("joined-members-list", joinedMembersDetails[data]);
+    });
 
-const io = require('socket.io')(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-})
-
-io.on('connection', (socket) => {
-  console.log('a user connected', socket.id)
-
-  socket.on('send_message', (data) => {
-    console.log(data)
-    socket.broadcast.emit('receive_message', data)
-  })
-  socket.on('drawing', (data) => socket.broadcast.emit('drawing', data))
-  socket.on('disconnect', () => {
-    console.log('user disconnected', socket.id)
-  })
-})
-
-const port = process.env.PORT || 8080
-server.listen(port, () => {
-  console.log('listening on *:4000')
-})
+    socket.on("disconnect", () => {
+      let roomID = membersRoom.get(socket.id);
+      if (roomID) {
+        let room = joinedMembersDetails[roomID];
+        if (room) {
+          let index = room.findIndex((member) => member.socketID === socket.id);
+          if (index !== -1) {
+            room.splice(index, 1);
+            joinedMembersDetails[roomID] = room;
+          }
+          socket.emit("joined-members-list", room);
+        }
+      }
+      membersRoom.delete(socket.id);
+    });
+  });
+};

@@ -1,25 +1,54 @@
-const express = require('express')
-const dotenv = require('dotenv')
-const cookieParser = require('cookie-parser')
-const cors = require('cors')
-dotenv.config()
+const express = require("express");
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const http = require("http");
+dotenv.config();
+const app = express();
 
-const database = require('./database/database')
-const userRouter = require('./routes/user')
-const app = express()
-const PORT = process.env.PORT || 5000
+const database = require("./database/database");
+const userRouter = require("./routes/user");
+const jamboardRouter = require("./routes/jamboard");
 
-app.use(cors())
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json({ extended: true }))
-app.use(cookieParser())
+const server = http.createServer(app);
 
-app.use('/api/user', userRouter)
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port http://localhost:${PORT}`)
-})
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ extended: true }));
+app.use(cookieParser());
+
+// importing sockets
+const chatSocket = require("./socket/chat");
+const jamboardSocket = require("./socket/jamboard");
+const voiceChatSocket = require("./socket/voice_chat");
+
+// using sockets
+chatSocket(io);
+jamboardSocket(io);
+voiceChatSocket(io);
+
+app.use("/api/user", userRouter);
+app.use("/api/jamboard", jamboardRouter);
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+server.listen(PORT, () => {
+  console.log(`Server running on port http://localhost:${PORT}`);
+});
