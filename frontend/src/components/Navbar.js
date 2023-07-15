@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CHECK_AUTH_URL } from "../constants";
+// import { CHECK_AUTH_URL } from "../constants";
 import Utils from "../utils";
 
 const Navbar = () => {
@@ -14,18 +14,18 @@ const Navbar = () => {
   const handleLoginButtonPressed = () => {
     navigator("/login");
   };
-  const handleMyJamsButtonPressed = () => {
-    navigator("/profile");
-  };
+  // const handleMyJamsButtonPressed = () => {
+  //   navigator("/profile");
+  // };
   const checkLoggedIn = async () => {
     const utils = new Utils();
     let res = await utils.checkLogin();
     setLoggedIn(res[0]);
   };
 
-  const handleNewSessionButtonPressed = () => {
-    navigator("/new-session");
-  };
+  // const handleNewSessionButtonPressed = () => {
+  //   navigator("/new-session");
+  // };
   useEffect(() => {
     checkLoggedIn();
   }, []);
@@ -38,7 +38,7 @@ const Navbar = () => {
       <div className="space-x-4">
         {loggedIn ? (
           <div className="">
-            <button
+            {/* <button
               onClick={handleNewSessionButtonPressed}
               className="btn btn-outline mx-3 text-orange-400"
             >
@@ -49,7 +49,7 @@ const Navbar = () => {
               className="btn btn-outline mx-3 text-orange-400"
             >
               My Jams
-            </button>
+            </button> */}
             <button className="btn btn-outline mx-3 text-orange-400">
               Logout
             </button>

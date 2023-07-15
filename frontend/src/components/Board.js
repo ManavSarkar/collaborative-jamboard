@@ -1,6 +1,8 @@
 import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import "../styles/main.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   faCaretDown,
@@ -26,6 +28,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import VoiceChat from "./VoiceChat";
 import { useParams } from "react-router-dom";
+// import { toast } from "react-toastify";
 
 var colorPen = "black",
   zoomval = 100;
@@ -411,7 +414,11 @@ function Board({ socket }) {
   }, []);
 
   return (
+    
     <div className=" w-full bg-slate-50 min-h-screen mx-2 col-span-2 text-black">
+      <div className="flex justify-end">
+        <ToastContainer />
+      </div>
       <div
         ref={bsize}
         id="container"
@@ -656,7 +663,11 @@ function Board({ socket }) {
         <button className="btn btn-outline btn-info mx-4 w-40">
           Download <FontAwesomeIcon icon={faDownload} className="mx-1" />
         </button>
-        <button className="btn btn-outline btn-success mx-4 w-36">
+        <button className="btn btn-outline btn-success mx-4 w-36" onClick={()=>{
+          navigator.clipboard.writeText(roomID);
+          toast.success("link copied")
+          
+        }}>
           Share <FontAwesomeIcon icon={faShare} className="mx-1" />
         </button>
       </div>
