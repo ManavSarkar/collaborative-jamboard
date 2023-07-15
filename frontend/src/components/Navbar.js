@@ -14,18 +14,22 @@ const Navbar = () => {
   const handleLoginButtonPressed = () => {
     navigator("/login");
   };
-  // const handleMyJamsButtonPressed = () => {
-  //   navigator("/profile");
-  // };
+
   const checkLoggedIn = async () => {
     const utils = new Utils();
     let res = await utils.checkLogin();
     setLoggedIn(res[0]);
   };
 
-  // const handleNewSessionButtonPressed = () => {
-  //   navigator("/new-session");
-  // };
+  const handleLogoutButtonPressed = async () => {
+    const utils = new Utils();
+    let res = await utils.logout();
+    if (res[0]) {
+      setLoggedIn(false);
+      navigator("/");
+    }
+  };
+
   useEffect(() => {
     checkLoggedIn();
   }, []);
@@ -38,19 +42,10 @@ const Navbar = () => {
       <div className="space-x-4">
         {loggedIn ? (
           <div className="">
-            {/* <button
-              onClick={handleNewSessionButtonPressed}
-              className="btn btn-outline mx-3 text-orange-400"
-            >
-              New Session
-            </button>
             <button
-              onClick={handleMyJamsButtonPressed}
+              onClick={handleLogoutButtonPressed}
               className="btn btn-outline mx-3 text-orange-400"
             >
-              My Jams
-            </button> */}
-            <button className="btn btn-outline mx-3 text-orange-400">
               Logout
             </button>
           </div>

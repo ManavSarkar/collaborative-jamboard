@@ -41,7 +41,7 @@ function Chatroom({ socket }) {
           className="btn btn-outline btn-primary w-72"
           onClick={handleClick}
         >
-          {buttonText} {icon}
+          {chatRoom ? "Joined Members" : "Chat with Everyone"} {icon}
         </button>
       </div>
     </div>

@@ -67,7 +67,10 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
-
+router.post("/logout", (req, res) => {
+  res.clearCookie("auth_cookie");
+  res.status(200).json({ success: true });
+});
 router.post("/checkloggedin", authenticate, (req, res) => {
   res.json({ success: true, user: req.user });
 });

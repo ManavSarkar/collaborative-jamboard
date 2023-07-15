@@ -31,7 +31,12 @@ module.exports = jamboardSocket = async (io) => {
         let room = joinedMembersDetails[roomID];
         if (room) {
           let index = room.findIndex((member) => member.socketID === socket.id);
+
           if (index !== -1) {
+            // get the user details from the room and emit to all the members
+            let user = room[index];
+            user.roomID = roomID;
+            socket.broadcast.emit("user-disconnected", user);
             room.splice(index, 1);
             joinedMembersDetails[roomID] = room;
           }

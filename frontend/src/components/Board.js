@@ -27,13 +27,14 @@ import {
   faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
 import VoiceChat from "./VoiceChat";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 // import { toast } from "react-toastify";
 
 var colorPen = "black",
   zoomval = 100;
 let shapeDr = "pen";
 function Board({ socket }) {
+  const navigate = useNavigate();
   const params = useParams();
   const roomID = params.id;
   const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
@@ -117,6 +118,7 @@ function Board({ socket }) {
   const colorsRef = useRef(null);
   const bsize = useRef(null);
   const clearCanvasButtonRef = useRef(null);
+  const boardDownloadButtonRef = useRef(null);
 
   useEffect(() => {
     // --------------- getContext() method returns a drawing context on the canvas-----
@@ -241,6 +243,16 @@ function Board({ socket }) {
     clearCanvasButtonRef.current.addEventListener("click", () =>
       clearCanvas(true)
     );
+
+    boardDownloadButtonRef.current.addEventListener("click", () => {
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const image = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.download = "my-image.png";
+      link.href = image;
+      link.click();
+    });
+
     // ---------------- mouse movement --------------------------------------
 
     const onMouseDown = (e) => {
@@ -355,8 +367,16 @@ function Board({ socket }) {
     // -------------- make the canvas fill its parent component -----------------
 
     const onResize = () => {
+      // get canvas image data
+      const data = context.getImageData(0, 0, canvas.width, canvas.height);
       canvas.width = bsize.current.offsetWidth;
       canvas.height = bsize.current.offsetHeight;
+      context.fillStyle = "white";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      // resize the data and draw it back
+      console.log(data);
+      context.putImageData(data, 0, 0);
     };
 
     window.addEventListener("resize", onResize, false);
@@ -411,11 +431,19 @@ function Board({ socket }) {
     socket.on("clearCanvasListen", (data) => {
       if (data === roomID) clearCanvas(false);
     });
+    socket.on("user-disconnected", (data) => {
+      if (data.roomID !== roomID) return;
+      toast.error(`${data.name} disconnected`);
+    });
   }, []);
 
   return (
-    
-    <div className=" w-full bg-slate-50 min-h-screen mx-2 col-span-2 text-black">
+    <div
+      className=" w-full bg-slate-50  mx-2 col-span-2 text-black"
+      style={{
+        height: "100vh",
+      }}
+    >
       <div className="flex justify-end">
         <ToastContainer />
       </div>
@@ -434,51 +462,6 @@ function Board({ socket }) {
         />
 
         <div className="tools flex justify-center">
-          {/* <div className="un-redo">
-            <button type="button" className="pen-tools ">
-              <FontAwesomeIcon icon={faUndo} />
-            </button>
-
-            <button type="button" className="pen-tools redo">
-              <FontAwesomeIcon icon={faRedo} />
-            </button>
-          </div>
-
-          <div className="zoomin">
-            <button
-              onClick={toggleDropdown4}
-              type="button"
-              className="pen-tools"
-            >
-              <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
-            </button>
-            <button
-              onClick={toggleDropdown4}
-              type="button"
-              className="pen-tools"
-            >
-              <FontAwesomeIcon icon={faCaretDown} />
-            </button>
-            {isDropdownOpen4 && (
-              <div className="dropdown-content zoom">
-                <button onClick={() => handleZoomIn(75)}>75%</button>
-                <button onClick={() => handleZoomIn(100)}>100%</button>
-                <button onClick={() => handleZoomIn(150)}>150%</button>
-                <button onClick={() => handleZoomIn(200)}>200%</button>
-              </div>
-            )}
-          </div> */}
-
-          {/* <div className="pages">
-            <button type="button" className="pen-tools">
-              <FontAwesomeIcon icon={faCaretLeft} />
-            </button>
-            <div className="pageNo">1/1</div>
-            <button type="button" className="pen-tools">
-              <FontAwesomeIcon icon={faCaretRight} />
-            </button>
-          </div> */}
-
           <div className="rest-tools">
             <button
               onClick={toggleDropdown1}
@@ -619,12 +602,6 @@ function Board({ socket }) {
                 </button>
               </div>
             )}
-            {/* <button type="button" className="pen-tools">
-              <FontAwesomeIcon icon={faUpload} />
-            </button>
-            <button type="button" className="pen-tools">
-              <FontAwesomeIcon icon={faFont} />
-            </button> */}
 
             <button
               ref={clearCanvasButtonRef}
@@ -635,39 +612,31 @@ function Board({ socket }) {
             </button>
           </div>
         </div>
-
-        {/* <div ref={colorsRef} className="colors">
-              <div className="color black" />
-              <div className="color red" />
-              <div className="color green" />
-              <div className="color blue" />
-              <div className="color yellow" />
-            </div> */}
       </div>
-      {/* <canvas 
-      onClick={notoggleDropdown} 
-      className="whiteBoard"
-
-        id='canvas'
-        width={1000}
-        height={950}
-        onMouseDown={startDrawing}
-        onMouseUp={finishDrawing}
-        onMouseMove={draw}
-        >
-      </canvas> */}
 
       <div className="flex justify-center items-center my-4">
-        <button className="btn btn-outline btn-error mx-4 w-36">Leave</button>
+        <button
+          className="btn btn-outline btn-error mx-4 w-36"
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          Leave
+        </button>
         <VoiceChat socket={socket} />
-        <button className="btn btn-outline btn-info mx-4 w-40">
+        <button
+          className="btn btn-outline btn-info mx-4 w-40"
+          ref={boardDownloadButtonRef}
+        >
           Download <FontAwesomeIcon icon={faDownload} className="mx-1" />
         </button>
-        <button className="btn btn-outline btn-success mx-4 w-36" onClick={()=>{
-          navigator.clipboard.writeText(roomID);
-          toast.success("link copied")
-          
-        }}>
+        <button
+          className="btn btn-outline btn-success mx-4 w-36"
+          onClick={() => {
+            navigator.clipboard.writeText(roomID);
+            toast.success("link copied");
+          }}
+        >
           Share <FontAwesomeIcon icon={faShare} className="mx-1" />
         </button>
       </div>
