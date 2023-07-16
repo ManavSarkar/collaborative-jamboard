@@ -34,9 +34,9 @@ const VoiceChat = ({ socket }) => {
     });
     socket.on("connected-users", (users) => {
       console.log("connected-users", users);
-      users.forEach((user) => {
-        connectToNewUser(user["peerID"]);
-      });
+      for (let i = 0; i < users.length; i++) {
+        connectToNewUser(users[i]["peerID"]);
+      }
     });
     socket.on("user-joined", (user) => {
       connectToNewUser(user["peerID"]);
