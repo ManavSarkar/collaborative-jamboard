@@ -30,13 +30,18 @@ const VoiceChat = ({ socket }) => {
     });
 
     peer.on("call", (call) => {
-      call.answer(myStreamRef.current);
-      call.on("stream", (remoteStream) => {
-        document.getElementsByTagName("audio")[count].srcObject = remoteStream;
-        document.getElementsByTagName("audio")[count].play();
-        document.getElementsByTagName("audio")[count].id = call.peer;
-        setCount((count) => count + 1);
-        console.log("count", count);
+      userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
+      userMedia.then((stream) => {
+        myStreamRef.current = stream;
+        call.answer(stream);
+        call.on("stream", (remoteStream) => {
+          document.getElementsByTagName("audio")[count].srcObject =
+            remoteStream;
+          document.getElementsByTagName("audio")[count].play();
+          document.getElementsByTagName("audio")[count].id = call.peer;
+          setCount((count) => count + 1);
+          console.log("count", count);
+        });
       });
     });
     socket.on("connected-users", (users) => {
