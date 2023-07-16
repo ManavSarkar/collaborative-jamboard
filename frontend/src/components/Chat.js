@@ -80,7 +80,7 @@ function Chat({ socket }) {
           <div className="flex">
             <input
               type="text"
-              className="flex-grow px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:border-blue-500"
+              className="bg-slate-50 flex-grow px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:border-blue-500"
               placeholder="Type your message..."
               value={currentMessage}
               onChange={(event) => {
