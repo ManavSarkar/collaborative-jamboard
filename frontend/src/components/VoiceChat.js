@@ -4,11 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 const VoiceChat = ({ socket }) => {
-  const [remotePeerID, setRemotePeerID] = useState("");
   const peerRef = useRef(null);
   const remoteAudioRef = useRef(null);
-  const [audioStreams, setAudioStreams] = useState(new Map());
-  const [connections, setConnections] = useState([]);
   const [muted, setMuted] = useState(false);
   const myStreamRef = useRef(null);
   const params = useParams();
@@ -37,25 +34,28 @@ const VoiceChat = ({ socket }) => {
     socket.on("connected-users", (users) => {
       console.log("connected-users", users);
       users.forEach((user) => {
-        connectToNewUser(user["socketID"], user["peerID"]);
+        connectToNewUser(user["peerID"]);
       });
     });
 
     socket.on("user-joined", (user) => {
-      connectToNewUser(user["socketID"], user["peerID"]);
+      connectToNewUser(user["peerID"]);
     });
   }, []);
 
-  const connectToNewUser = (socketID, peerID) => {
+  const connectToNewUser = (peerID) => {
     if (peerRef.current == null || peerRef.current.id === peerID) return;
     const call = peerRef.current.call(peerID, myStreamRef.current);
     if (call === undefined) return;
     call.on("stream", (remoteStream) => {
-      remoteAudioRef.current.srcObject = remoteStream;
-      remoteAudioRef.current.play();
+      // remoteAudioRef.current.srcObject = remoteStream;
+      // remoteAudioRef.current.play();
+      // append audio element to container with id audios
+      const audioEl = document.createElement("audio");
+      audioEl.srcObject = remoteStream;
+      document.getElementById("audios").appendChild(audioEl);
+      audioEl.play();
     });
-
-    setConnections((prevConnections) => [...prevConnections, call]);
   };
   const handleMute = () => {
     myStreamRef.current.getAudioTracks()[0].enabled =
@@ -72,7 +72,7 @@ const VoiceChat = ({ socket }) => {
       onClick={handleMute}
     >
       <button>Mute</button>
-      <audio ref={remoteAudioRef} autoPlay />
+      <div id="audios">{/* <audio ref={remoteAudioRef} autoPlay /> */}</div>
       <FontAwesomeIcon icon={faMicrophone} className="mx-1" />
     </div>
   );
