@@ -289,12 +289,8 @@ function Board({ socket }) {
       current.x = e.clientX || e.touches[0].clientX;
       current.y = e.clientY || e.touches[0].clientY;
     };
-    const saveCanvasData = () => {
-      const data = context.getImageData(0, 0, canvas.width, canvas.height);
-      console.log(data);
-    };
+
     const onMouseUp = (e) => {
-      saveCanvasData();
       console.log(shapeDr);
       if (!drawing) {
         return;
@@ -438,7 +434,7 @@ function Board({ socket }) {
 
     socket.on("boardDrawing", onDrawingEvent);
     socket.on("clearCanvasListen", (data) => {
-      if (data === roomID) clearCanvas(false);
+      if (data.roomID === roomID) clearCanvas(false);
     });
     socket.on("user-disconnected", (data) => {
       if (data.roomID !== roomID) return;
