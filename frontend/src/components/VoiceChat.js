@@ -47,6 +47,7 @@ const VoiceChat = ({ socket }) => {
     if (peerRef.current == null || peerRef.current.id === peerID) return;
     const call = peerRef.current.call(peerID, myStreamRef.current);
     if (call === undefined) return;
+    console.log("peerID", peerID);
     call.on("stream", (remoteStream) => {
       // remoteAudioRef.current.srcObject = remoteStream;
       // remoteAudioRef.current.play();
@@ -54,8 +55,8 @@ const VoiceChat = ({ socket }) => {
       const audioEl = document.createElement("audio");
       audioEl.id = peerID;
       audioEl.srcObject = remoteStream;
-      document.getElementById("audios").appendChild(audioEl);
       audioEl.play();
+      document.getElementById("audios").appendChild(audioEl);
     });
   };
   const handleMute = () => {
@@ -73,7 +74,7 @@ const VoiceChat = ({ socket }) => {
       onClick={handleMute}
     >
       <button>Mute</button>
-      <div id="audios">{/* <audio ref={remoteAudioRef} autoPlay /> */}</div>
+      <div id="audios"></div>
       <FontAwesomeIcon icon={faMicrophone} className="mx-1" />
     </div>
   );
