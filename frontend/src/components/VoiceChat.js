@@ -9,7 +9,7 @@ const VoiceChat = ({ socket }) => {
   const [muted, setMuted] = useState(false);
   const myStreamRef = useRef(null);
   const params = useParams();
-  const [audioStreams, setAudioStreams] = useState([]);
+  let count = 0;
   useEffect(() => {
     let userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -27,17 +27,17 @@ const VoiceChat = ({ socket }) => {
       console.log("My peer ID is: " + id);
       socket.emit("user-add", { peerID: peer.id, roomID: params.id });
       peerRef.current = peer;
-      socket.on("connected-users", (users) => {
-        console.log("connected-users", users);
-        users.forEach((user) => {
-          connectToNewUser(user["peerID"]);
-        });
-      });
     });
+
     peer.on("call", (call) => {
       call.answer(myStreamRef.current);
     });
-
+    socket.on("connected-users", (users) => {
+      console.log("connected-users", users);
+      users.forEach((user) => {
+        connectToNewUser(user["peerID"]);
+      });
+    });
     socket.on("user-joined", (user) => {
       connectToNewUser(user["peerID"]);
     });
@@ -47,13 +47,10 @@ const VoiceChat = ({ socket }) => {
     if (peerRef.current == null || peerRef.current.id === peerID) return;
     const call = peerRef.current.call(peerID, myStreamRef.current);
     if (call === undefined) return;
-    console.log("peerID", peerID);
     call.on("stream", (remoteStream) => {
-      var audioElement = document.createElement("audio");
-      audioElement.srcObject = remoteStream;
-      audioElement.play();
-      audioElement.id = peerID;
-      document.getElementById("audios").appendChild(audioElement);
+      document.getElementsByTagName("audio")[count].srcObject = remoteStream;
+      document.getElementsByTagName("audio")[count].play();
+      count++;
     });
   };
   const handleMute = () => {
@@ -70,7 +67,40 @@ const VoiceChat = ({ socket }) => {
       onClick={handleMute}
     >
       <button>Mute</button>
-      <div id="audios"></div>
+      <div id="audios">
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+        <audio autoPlay></audio>
+      </div>
       <FontAwesomeIcon icon={faMicrophone} className="mx-1" />
     </div>
   );
