@@ -50,6 +50,7 @@ const VoiceChat = ({ socket }) => {
     call.on("stream", (remoteStream) => {
       document.getElementsByTagName("audio")[count].srcObject = remoteStream;
       document.getElementsByTagName("audio")[count].play();
+      document.getElementsByTagName("audio")[count].id = peerID;
       count++;
     });
   };
