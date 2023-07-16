@@ -29,6 +29,7 @@ function Loginpage() {
           return;
         }
         toast.success("Login Successful");
+        localStorage.setItem("token", "Bearer " + result.token);
         setTimeout(() => {
           navigate("/");
         }, 1000);

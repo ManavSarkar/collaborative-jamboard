@@ -56,10 +56,11 @@ router.post("/login", async (req, res) => {
     }
 
     const token = await user.generateAuthToken();
-    res.cookie("auth_cookie", token, {
-      expires: new Date(Date.now() + 2592000000),
-    });
-    res.json({ success: true });
+    // res.cookie("auth_cookie", token, {
+    //   expires: new Date(Date.now() + 2592000000),
+    //   httpOnly: true,
+    // });
+    res.json({ success: true, token: token });
   } catch (error) {
     // Handle any potential errors
     console.error(error);
