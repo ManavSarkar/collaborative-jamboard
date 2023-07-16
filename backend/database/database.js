@@ -2,7 +2,7 @@ const mongo = require("mongoose");
 
 var mongoose = require("mongoose");
 //Set up default mongoose connection
-var mongoDB = "mongodb://127.0.0.1:27017";
+var mongoDB = process.env.mongodb_url;
 mongoose
   .connect(mongoDB, { useNewUrlParser: true })
   .then(() => {
