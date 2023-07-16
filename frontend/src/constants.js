@@ -1,6 +1,10 @@
-export const SOCKET_URL = "http://localhost:5000";
-export const REGISTER_URL = "http://localhost:5000/api/user/register";
-export const CHECK_AUTH_URL = "http://localhost:5000/api/user/checkloggedin";
-export const LOGIN_URL = "http://localhost:5000/api/user/login";
-export const CREATE_SESSION_URL = "http://localhost:5000/api/jamboard/create";
-export const LOGOUT_URL = "http://localhost:5000/api/user/logout";
+export const SOCKET_URL = "https://jamboard-backend.onrender.com";
+export const REGISTER_URL =
+  "https://jamboard-backend.onrender.com/api/user/register";
+export const CHECK_AUTH_URL =
+  "https://jamboard-backend.onrender.com/api/user/checkloggedin";
+export const LOGIN_URL = "https://jamboard-backend.onrender.com/api/user/login";
+export const CREATE_SESSION_URL =
+  "https://jamboard-backend.onrender.com/api/jamboard/create";
+export const LOGOUT_URL =
+  "https://jamboard-backend.onrender.com/api/user/logout";

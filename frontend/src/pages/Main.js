@@ -5,10 +5,11 @@ import Chatroom from "../components/Chatroom";
 import io from "socket.io-client";
 import { useEffect, useState } from "react";
 import Utils from "../utils";
+import { SOCKET_URL } from "../constants";
 function Session() {
   const params = useParams();
   const [searchParams] = useSearchParams();
-  const socket = io.connect("http://localhost:5000/");
+  const socket = io.connect(SOCKET_URL);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
