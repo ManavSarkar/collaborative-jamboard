@@ -388,6 +388,8 @@ function Board({ socket }) {
 
     window.addEventListener("resize", onResize, false);
     onResize();
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
     // ----------------------- socket.io connection ----------------------------
     const onDrawingEvent = (data) => {
