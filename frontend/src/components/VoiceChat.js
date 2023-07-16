@@ -52,6 +52,7 @@ const VoiceChat = ({ socket }) => {
       document.getElementsByTagName("audio")[count].play();
       document.getElementsByTagName("audio")[count].id = peerID;
       setCount((count) => count + 1);
+      console.log("count", count);
     });
   };
   const handleMute = () => {
