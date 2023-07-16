@@ -6,6 +6,7 @@ const Authenticate = async (req, res, next) => {
     if (token) {
       token = token.split(" ")[1];
     }
+    console.log("Token " + token);
     const verify = jwt.verify(token, "process.env.SECRET_KEY");
     const rootUser = await User.findById({ _id: verify._id });
     if (rootUser === null) {

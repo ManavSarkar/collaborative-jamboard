@@ -6,7 +6,7 @@ export default class Utils {
     if (!token) {
       return [false, null];
     }
-
+    console.log(token);
     let res = await fetch(CHECK_AUTH_URL, {
       method: "post",
       headers: {
