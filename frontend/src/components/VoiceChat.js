@@ -30,18 +30,13 @@ const VoiceChat = ({ socket }) => {
     });
 
     peer.on("call", (call) => {
-      userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
-      userMedia.then((stream) => {
-        myStreamRef.current = stream;
-        call.answer(stream);
-        call.on("stream", (remoteStream) => {
-          document.getElementsByTagName("audio")[count].srcObject =
-            remoteStream;
-          document.getElementsByTagName("audio")[count].play();
-          document.getElementsByTagName("audio")[count].id = call.peer;
-          setCount((count) => count + 1);
-          console.log("count", count);
-        });
+      call.answer(myStreamRef.current);
+      call.on("stream", (remoteStream) => {
+        document.getElementsByTagName("audio")[count].srcObject = remoteStream;
+        document.getElementsByTagName("audio")[count].play();
+        document.getElementsByTagName("audio")[count].id = call.peer;
+        setCount((count) => count + 1);
+        console.log("count", count);
       });
     });
     socket.on("connected-users", (users) => {
@@ -57,15 +52,19 @@ const VoiceChat = ({ socket }) => {
 
   const connectToNewUser = (peerID) => {
     if (peerRef.current == null || peerRef.current.id === peerID) return;
-    const call = peerRef.current.call(peerID, myStreamRef.current);
-    if (call === undefined) return;
-    // call.on("stream", (remoteStream) => {
-    //   document.getElementsByTagName("audio")[count].srcObject = remoteStream;
-    //   document.getElementsByTagName("audio")[count].play();
-    //   document.getElementsByTagName("audio")[count].id = peerID;
-    //   setCount((count) => count + 1);
-    //   console.log("count", count);
-    // });
+    let userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
+    userMedia.then((stream) => {
+      myStreamRef.current = stream;
+      const call = peerRef.current.call(peerID, stream);
+      if (call === undefined) return;
+      call.on("stream", (remoteStream) => {
+        document.getElementsByTagName("audio")[count].srcObject = remoteStream;
+        document.getElementsByTagName("audio")[count].play();
+        document.getElementsByTagName("audio")[count].id = peerID;
+        setCount((count) => count + 1);
+        console.log("count", count);
+      });
+    });
   };
   const handleMute = () => {
     myStreamRef.current.getAudioTracks()[0].enabled =
