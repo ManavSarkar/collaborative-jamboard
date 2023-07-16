@@ -52,6 +52,7 @@ const VoiceChat = ({ socket }) => {
       // remoteAudioRef.current.play();
       // append audio element to container with id audios
       const audioEl = document.createElement("audio");
+      audioEl.id = peerID;
       audioEl.srcObject = remoteStream;
       document.getElementById("audios").appendChild(audioEl);
       audioEl.play();
