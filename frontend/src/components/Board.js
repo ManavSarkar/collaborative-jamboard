@@ -36,6 +36,13 @@ let shapeDr = "pen";
 function Board({ socket }) {
   const navigate = useNavigate();
   const params = useParams();
+  // detect back button click
+  useLayoutEffect(() => {
+    window.addEventListener("popstate", () => {
+      navigate(`/`);
+      window.location.reload();
+    });
+  }, []);
   const roomID = params.id;
   const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
@@ -619,6 +626,8 @@ function Board({ socket }) {
           className="btn btn-outline btn-error mx-4 w-36"
           onClick={() => {
             navigate("/");
+            // refresh
+            window.location.reload();
           }}
         >
           Leave
