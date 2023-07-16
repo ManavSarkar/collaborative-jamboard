@@ -9,7 +9,7 @@ const VoiceChat = ({ socket }) => {
   const [muted, setMuted] = useState(false);
   const myStreamRef = useRef(null);
   const params = useParams();
-  const [audioElements, setAudioElements] = useState([]);
+  const [audioStreams, setAudioStreams] = useState([]);
   useEffect(() => {
     let userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -27,16 +27,15 @@ const VoiceChat = ({ socket }) => {
       console.log("My peer ID is: " + id);
       socket.emit("user-add", { peerID: peer.id, roomID: params.id });
       peerRef.current = peer;
+      socket.on("connected-users", (users) => {
+        console.log("connected-users", users);
+        users.forEach((user) => {
+          connectToNewUser(user["peerID"]);
+        });
+      });
     });
     peer.on("call", (call) => {
       call.answer(myStreamRef.current);
-    });
-
-    socket.on("connected-users", (users) => {
-      console.log("connected-users", users);
-      users.forEach((user) => {
-        connectToNewUser(user["peerID"]);
-      });
     });
 
     socket.on("user-joined", (user) => {
@@ -50,14 +49,11 @@ const VoiceChat = ({ socket }) => {
     if (call === undefined) return;
     console.log("peerID", peerID);
     call.on("stream", (remoteStream) => {
-      // remoteAudioRef.current.srcObject = remoteStream;
-      // remoteAudioRef.current.play();
-      // append audio element to container with id audios
-      const audioEl = document.createElement("audio");
-      audioEl.id = peerID;
-      audioEl.srcObject = remoteStream;
-      audioEl.play();
-      setAudioElements([...audioElements, audioEl]);
+      var audioElement = document.createElement("audio");
+      audioElement.srcObject = remoteStream;
+      audioElement.play();
+      audioElement.id = peerID;
+      document.getElementById("audios").appendChild(audioElement);
     });
   };
   const handleMute = () => {
@@ -74,11 +70,7 @@ const VoiceChat = ({ socket }) => {
       onClick={handleMute}
     >
       <button>Mute</button>
-      <div id="audios">
-        {audioElements.map((audioEl) => {
-          return audioEl;
-        })}
-      </div>
+      <div id="audios"></div>
       <FontAwesomeIcon icon={faMicrophone} className="mx-1" />
     </div>
   );
