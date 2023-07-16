@@ -9,7 +9,7 @@ const VoiceChat = ({ socket }) => {
   const [muted, setMuted] = useState(false);
   const myStreamRef = useRef(null);
   const params = useParams();
-  let count = 0;
+  const [count, setCount] = useState(0);
   useEffect(() => {
     let userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -51,7 +51,7 @@ const VoiceChat = ({ socket }) => {
       document.getElementsByTagName("audio")[count].srcObject = remoteStream;
       document.getElementsByTagName("audio")[count].play();
       document.getElementsByTagName("audio")[count].id = peerID;
-      count++;
+      setCount((count) => count + 1);
     });
   };
   const handleMute = () => {
