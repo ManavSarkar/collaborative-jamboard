@@ -9,6 +9,7 @@ const VoiceChat = ({ socket }) => {
   const [muted, setMuted] = useState(false);
   const myStreamRef = useRef(null);
   const params = useParams();
+  const [audioElements, setAudioElements] = useState([]);
   useEffect(() => {
     let userMedia = navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -56,14 +57,13 @@ const VoiceChat = ({ socket }) => {
       audioEl.id = peerID;
       audioEl.srcObject = remoteStream;
       audioEl.play();
-      document.getElementById("audios").appendChild(audioEl);
+      setAudioElements([...audioElements, audioEl]);
     });
   };
   const handleMute = () => {
     myStreamRef.current.getAudioTracks()[0].enabled =
       !myStreamRef.current.getAudioTracks()[0].enabled;
 
-    alert(myStreamRef.current.getAudioTracks()[0].enabled);
     setMuted(!muted);
   };
   return (
@@ -74,7 +74,11 @@ const VoiceChat = ({ socket }) => {
       onClick={handleMute}
     >
       <button>Mute</button>
-      <div id="audios"></div>
+      <div id="audios">
+        {audioElements.map((audioEl) => {
+          return audioEl;
+        })}
+      </div>
       <FontAwesomeIcon icon={faMicrophone} className="mx-1" />
     </div>
   );
