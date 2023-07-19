@@ -2,6 +2,21 @@ module.exports = jamboardSocket = async (io) => {
   let joinedMembersDetails = new Map();
   let membersRoom = new Map();
   io.on("connection", (socket) => {
+    socket.on("newStroke", (data) => {
+      socket.broadcast.emit("newStroke", data);
+    });
+    socket.on("decrementPage", (data) => {
+      socket.broadcast.emit("decrementPage", data);
+    });
+    socket.on("eraseCompletePage", (data) => {
+      socket.broadcast.emit("eraseCompletePage", data);
+    });
+    socket.on("incrementPage", (data) => {
+      socket.broadcast.emit("incrementPage", data);
+    });
+    socket.on("newPage", (data) => {
+      socket.broadcast.emit("newPage", data);
+    });
     socket.on("drawing", (data) => {
       socket.broadcast.emit("boardDrawing", data);
     });

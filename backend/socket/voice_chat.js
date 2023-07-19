@@ -36,6 +36,13 @@ module.exports = voiceChatSocket = async (io) => {
     socket.on("disconnect", () => {
       socket.broadcast.emit("user-left", socket.id);
       userPeerIDs.delete(socket.id);
+      //  // remove user from userPeerIDs
+      // userPeerIDs.forEach((room, roomID) => {
+      //   if (room.has(socket.id)) {
+      //     room.delete(socket.id);
+      //     userPeerIDs.set(roomID, room);
+      //   }
+      // });
     });
   });
 };
