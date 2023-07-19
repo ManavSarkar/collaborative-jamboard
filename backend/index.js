@@ -26,6 +26,8 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://collaborative-jamboard.vercel.app",
+
+      "https://collaborative-jamboard-frontend.vercel.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
