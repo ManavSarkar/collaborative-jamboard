@@ -1,28 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Joan&family=Roboto+Mono:wght@300&family=Roboto+Slab:wght@300&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Joan&family=Roboto+Mono:wght@300&family=Roboto+Slab:wght@300&display=swap");
 
-body{
-    font-family: 'Joan', serif;
-    font-family: 'Roboto Mono', monospace;
-    font-family: 'Roboto Slab', serif;
-    
+body {
+  font-family: "Joan", serif;
+  font-family: "Roboto Mono", monospace;
+  font-family: "Roboto Slab", serif;
 }
-.header{
-    font-weight: 700;
-    font-size: 1.5rem;
-    padding-left: 5%;
-    padding-bottom: 10px;
+.header {
+  font-weight: 700;
+  font-size: 1.5rem;
+  padding-left: 5%;
+  padding-bottom: 10px;
 }
 
 #container {
-    position: relative;
-  }
-  #container canvas, .tools {
-    position: absolute;
-  }
-  
+  position: relative;
+}
+#container canvas,
+.tools {
+  position: absolute;
+}
 
 /* .whiteboard {
     margin-top: 5%;
@@ -32,7 +31,7 @@ body{
     background-color: #fff;
     cursor: crosshair;
   } */
-  
+
 /* img{
     height: 5%;
     width: 5%;
@@ -44,14 +43,14 @@ body{
     border: 1px solid black;
     cursor: crosshair;
   } */
-  .whiteboard{
-    height: 100%;
-    width: 100%;
-    background-color: rgb(255, 255, 255);
-    cursor: url('pencil2.png') -12 6, auto;
-  }
+.whiteboard {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  cursor: url("pencil2.png") -12 6, auto;
+}
 
-  /* .colors {
+/* .colors {
     position: fixed;
   }
   
@@ -66,24 +65,24 @@ body{
   .color.green { background-color: green; }
   .color.blue { background-color: blue; }
   .color.yellow { background-color: yellow; } */
-  
-.main{
-    display: flex;
-    flex-direction: row;
+
+.main {
+  display: flex;
+  flex-direction: row;
 }
 
-.chatroom{
-    width: 20%;
-    /* margin-left: auto; */
-    border: 2px solid black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5px;
+.chatroom {
+  width: 20%;
+  /* margin-left: auto; */
+  border: 2px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
 }
-.main-board{
-    margin: 0 auto;
-    width: 80%;
+.main-board {
+  margin: 0 auto;
+  width: 80%;
 }
 /* .whiteBoard{
     height: 750px;
@@ -94,24 +93,24 @@ body{
     justify-content: center; 
 }*/
 
-.tools{
-    display: flex;
-    /* flex-direction: row; */
-    text-align: center;
-    /* padding-left: 10%; */
-    width: 80%;
-    padding-right: -20%;
-    border: 1px solid black;
-    margin-left: 10%;
-    /* padding-left: 2 %; */
-    border-radius: 2rem;
-    box-shadow: 3px 3px #989898;
+.tools {
+  display: flex;
+  /* flex-direction: row; */
+  text-align: center;
+  /* padding-left: 10%; */
+  width: 80%;
+  padding-right: -20%;
+  border: 1px solid black;
+  margin-left: 10%;
+  /* padding-left: 2 %; */
+  border-radius: 2rem;
+  box-shadow: 3px 3px #989898;
 }
-.pen-tools{
-    /* height: 70px;
+.pen-tools {
+  /* height: 70px;
     width: 70px; */
-    background-color: rgb(255, 255, 255);
-    border: 0;
+  background-color: rgb(255, 255, 255);
+  border: 0;
 }
 
 /* .tools button{
@@ -120,88 +119,91 @@ body{
     padding: 10px 5px;
 } */
 
-.pages, .un-redo, .zoomin, .rest-tools{
-    display: flex;
-    flex-direction: row;
-    padding: 0% 3%;
-    border-right: 1px black solid;
-    margin: 1px 0;
+.pages,
+.un-redo,
+.zoomin,
+.rest-tools {
+  display: flex;
+  flex-direction: row;
+  padding: 0% 3%;
+  border-right: 1px black solid;
+  margin: 1px 0;
 }
 
-.un-redo button{
-    margin: 0 10%;
+.un-redo button {
+  margin: 0 10%;
 }
 
-.rest-tools{
-    width: 45%;
+.rest-tools {
+  width: 45%;
 }
 
-.rest-tools{
-    line-height: 1;
-    margin: 0;
+.rest-tools {
+  line-height: 1;
+  margin: 0;
 }
 
-.rest-tools button{
-    padding: 0 10%;
+.rest-tools button {
+  padding: 0 10%;
 }
 .dropdown-content {
-    position: absolute;
-    /* top: 100%;
+  position: absolute;
+  /* top: 100%;
     left: 0; */
-    top: 13%;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    padding: 10px;
-    width: 200px;
-  }
-.pen{
-    top: 100%;
-    left: 28%;
-    display: flex;
-    flex-direction: column;
+  top: 13%;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 200px;
 }
-.pen button{
-    height: 2rem;
-    width: 1.5rem;
-    /* border: 1px solid black; */
-    border-radius: 50%;
-    margin: 10px 5px;
+.pen {
+  top: 100%;
+  left: 28%;
+  display: flex;
+  flex-direction: column;
 }
-
-.eraser{
-    top: 100%;
-    left: 34%;
+.pen button {
+  height: 2rem;
+  width: 1.5rem;
+  /* border: 1px solid black; */
+  border-radius: 50%;
+  margin: 10px 5px;
 }
 
-.shapes{
-    top: 100%;
-    left: 40%;
+.eraser {
+  top: 100%;
+  left: 34%;
 }
-.shapes button{
-    height: 2rem;
-    width: 1.5rem;
-    /* border: 1px solid black; */
-    border-radius: 50%;
-    margin: 10px 5px;
+
+.shapes {
+  top: 100%;
+  left: 40%;
 }
-.zoom{
-    /* display: flex; */
-    top: 85%;
-    display: flex;
-    flex-direction: column;
-    width: 7%;
+.shapes button {
+  height: 2rem;
+  width: 1.5rem;
+  /* border: 1px solid black; */
+  border-radius: 50%;
+  margin: 10px 5px;
 }
-.zoom button{
-    float: left;
+.zoom {
+  /* display: flex; */
+  top: 85%;
+  display: flex;
+  flex-direction: column;
+  width: 7%;
 }
-  
-.pages .pageNo{
-    text-align: center;
-    width: 50px;
-    border: 1px solid black;
-    margin: 9px;
+.zoom button {
+  float: left;
+}
+
+.pages .pageNo {
+  text-align: center;
+  width: 50px;
+  border: 1px solid black;
+  margin: 9px;
 }
 
 .drawing-cursor {
-    cursor: url(../Icons/pencil.png) 0 16, crosshair; /* Replace pen-cursor.png with the path to your custom pen cursor image */
+  cursor: url(../Icons/pencil.png) 0 16, crosshair; /* Replace pen-cursor.png with the path to your custom pen cursor image */
 }

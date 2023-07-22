@@ -17,17 +17,16 @@ const Navbar = () => {
 
   const checkLoggedIn = async () => {
     const utils = new Utils();
-    let res = await utils.checkLogin();
-    setLoggedIn(res[0]);
+    utils.checkLogin().then((res) => {
+      setLoggedIn(res[0]);
+    });
   };
 
   const handleLogoutButtonPressed = async () => {
-    const utils = new Utils();
-    let res = await utils.logout();
-    if (res[0]) {
-      setLoggedIn(false);
-      navigator("/");
-    }
+    localStorage.removeItem("token");
+
+    setLoggedIn(false);
+    navigator("/");
   };
 
   useEffect(() => {
@@ -36,12 +35,35 @@ const Navbar = () => {
 
   return (
     <nav className="px-4 py-2 flex items-center justify-between">
-      <div className="text-white font-bold text-2xl">
+      <div
+        className=" font-bold text-2xl"
+        onClick={() => {
+          navigator("/");
+        }}
+      >
         Collaborative Jamboard
       </div>
+
       <div className="space-x-4">
         {loggedIn ? (
           <div className="">
+            <button
+              onClick={() => {
+                navigator("/");
+              }}
+              className="btn btn-outline mx-3 text-orange-400"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => {
+                navigator("/about");
+              }}
+              className="btn btn-outline mx-3 text-orange-400"
+            >
+              About
+            </button>
+
             <button
               onClick={handleLogoutButtonPressed}
               className="btn btn-outline mx-3 text-orange-400"
@@ -51,6 +73,23 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="">
+            <button
+              onClick={() => {
+                navigator("/");
+              }}
+              className="btn btn-outline mx-3 text-orange-400"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => {
+                navigator("/about");
+              }}
+              className="btn btn-outline mx-3 text-orange-400"
+            >
+              About
+            </button>
+
             <button
               onClick={handleSignUpButtonPressed}
               className="btn btn-outline mx-3 text-orange-400"

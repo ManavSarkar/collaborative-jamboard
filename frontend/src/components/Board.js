@@ -5,37 +5,28 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import {
-  faCaretDown,
-  faCaretLeft,
-  faCaretRight,
-  faEraser,
-  faFont,
-  faMagnifyingGlassPlus,
-  faPencil,
-  faRedo,
-  faShapes,
-  faTrash,
-  faUndo,
-  faUpload,
+  faBackward,
+  faCircle,
   faDownload,
+  faEraser,
+  faForward,
+  faMinus,
+  faPencil,
+  faPlus,
   faShare,
   faSquare,
-  faCircle,
-  faRectangleAd,
-  faMinus,
-  faPencilAlt,
-  faMicrophone,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import VoiceChat from "./VoiceChat";
 import { useNavigate, useParams } from "react-router-dom";
-// import { toast } from "react-toastify";
-
-var colorPen = "black",
-  zoomval = 100;
-let shapeDr = "pen";
+import jsPDF from "jspdf";
+let shape = "pen";
 function Board({ socket }) {
   const navigate = useNavigate();
   const params = useParams();
+  let drawing = false;
+  let current = {};
+
   // detect back button click
   useLayoutEffect(() => {
     window.addEventListener("popstate", () => {
@@ -43,136 +34,66 @@ function Board({ socket }) {
       window.location.reload();
     });
   }, []);
+
   const roomID = params.id;
-  const [isDropdownOpen1, setIsDropdownOpen1] = useState(false);
-  const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
-  const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
-  const [isDropdownOpen4, setIsDropdownOpen4] = useState(false);
 
-  const [selectedColor1, setSelectedColor1] = useState("black");
+  const [pages, setPages] = useState([[]]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [size, setSize] = useState(80);
+  const [colour, setColour] = useState("#000000");
   const [currentShape, setCurrentShape] = useState("pen");
-  // const [selectedColor2, setSelectedColor2] = useState('black');
-
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [zoomLevel1, setZoomLevel1] = useState(100);
-  const [zoomLevel2, setZoomLevel2] = useState(100);
-  const [zoomLevel3, setZoomLevel3] = useState(100);
-
-  const notoggleDropdown = () => {
-    setIsDropdownOpen1(false);
-    setIsDropdownOpen2(false);
-    setIsDropdownOpen3(false);
-  };
-
-  const toggleDropdown1 = () => {
-    colorPen = "black";
-    zoomval = 100;
-    shapeDr = "pen";
-    setCurrentShape("pen");
-    setIsDropdownOpen1(!isDropdownOpen1);
-    setIsDropdownOpen2(false);
-    setIsDropdownOpen3(false);
-  };
-  const toggleDropdown2 = () => {
-    colorPen = "white";
-    // zoomval = 500;
-    shapeDr = "eraser";
-    setCurrentShape("eraser");
-    setIsDropdownOpen2(!isDropdownOpen2);
-    setIsDropdownOpen1(false);
-    setIsDropdownOpen3(false);
-  };
-  const toggleDropdown3 = () => {
-    setIsDropdownOpen3(!isDropdownOpen3);
-    setIsDropdownOpen1(false);
-    setIsDropdownOpen2(false);
-  };
-  const toggleDropdown4 = () => {
-    setIsDropdownOpen4(!isDropdownOpen4);
-  };
-
-  const handleZoomChange1 = (event) => {
-    zoomval = parseInt(event.target.value);
-    shapeDr = "pen";
-    setCurrentShape("pen");
-    const newZoomLevel = parseInt(event.target.value);
-    setZoomLevel1(newZoomLevel);
-  };
-  const handleZoomChange2 = (event) => {
-    zoomval = parseInt(event.target.value) + 5000;
-    shapeDr = "eraser";
-    setCurrentShape("eraser");
-    const newZoomLevel = parseInt(event.target.value);
-    setZoomLevel2(newZoomLevel);
-  };
-  const handleZoomChange3 = (event) => {
-    const newZoomLevel = parseInt(event.target.value);
-    setZoomLevel3(newZoomLevel);
-  };
-
-  const handleZoomIn = (zoom) => {
-    setZoomLevel(zoom);
-    setIsDropdownOpen4(false); // Close the dropdown after selecting zoom option
-  };
-
-  const handleColorChange1 = (color) => {
-    colorPen = color;
-    setSelectedColor1(color);
-    setIsDropdownOpen1(false);
-  };
 
   const canvasRef = useRef(null);
-  const colorsRef = useRef(null);
-  const bsize = useRef(null);
-  const clearCanvasButtonRef = useRef(null);
-  const boardDownloadButtonRef = useRef(null);
-
-  useEffect(() => {
-    // --------------- getContext() method returns a drawing context on the canvas-----
-
+  const saveToCurrentPage = (data) => {
+    console.log(data, currentPage);
+    setPages((prev) => {
+      prev[currentPage].push(data);
+      return prev;
+    });
+  };
+  const drawLine = (x0, y0, x1, y1, color, size, emit) => {
     const canvas = canvasRef.current;
-    const test = colorsRef.current;
     const context = canvas.getContext("2d");
 
-    // ----------------------- Colors --------------------------------------------------
+    context.beginPath();
 
-    const colors = document.getElementsByClassName("color");
-    console.log(colors, "the colors");
-    console.log(test);
-    // set the current color
-    const current = {
-      color: "black",
-    };
+    context.moveTo(x0, y0);
+    context.lineTo(x1, y1);
+    context.strokeStyle = color;
+    context.lineWidth = 2 * (size / 100);
+    context.stroke();
+    context.closePath();
 
-    // helper that will update the current color
-    const onColorUpdate = (e) => {
-      current.color = e.target.className.split(" ")[1];
-    };
-
-    // loop through the color elements and add the click event listeners
-    for (let i = 0; i < colors.length; i++) {
-      colors[i].addEventListener("click", onColorUpdate, false);
+    if (!emit) {
+      return;
     }
-    let drawing = false;
+    const w = canvas.width;
+    const h = canvas.height;
+    saveToCurrentPage({ x0, y0, x1, y1, color, size, shape, roomID });
+    socket.emit("drawing", {
+      x0: x0 / w,
+      y0: y0 / h,
+      x1: x1 / w,
+      y1: y1 / h,
+      color,
+      size,
+      shape: shape,
+      roomID: roomID,
+    });
+  };
+  const drawRectangle = (x0, y0, x1, y1, color, size, emit) => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
 
-    // ------------------------------- create the drawing ----------------------------
-    console.log(colorPen);
-    const drawLine = (x0, y0, x1, y1, color, size, emit) => {
-      context.beginPath();
-
-      context.moveTo(x0, y0);
-      context.lineTo(x1, y1);
-      context.strokeStyle = color;
-      context.lineWidth = 2 * (size / 100);
-      context.stroke();
-      context.closePath();
-
-      if (!emit) {
-        return;
-      }
-      const w = canvas.width;
-      const h = canvas.height;
-
+    context.beginPath();
+    context.rect(x1, y1, x0 - x1, y0 - y1);
+    context.strokeStyle = color;
+    context.lineWidth = 2 * (size / 100);
+    context.stroke();
+    const w = canvas.width;
+    const h = canvas.height;
+    if (emit) {
+      saveToCurrentPage({ x0, y0, x1, y1, color, size, shape, roomID });
       socket.emit("drawing", {
         x0: x0 / w,
         y0: y0 / h,
@@ -180,259 +101,293 @@ function Board({ socket }) {
         y1: y1 / h,
         color,
         size,
-        shape: shapeDr,
+        shape: shape,
         roomID: roomID,
       });
-    };
+    }
+  };
 
-    const drawRectangle = (x0, y0, x1, y1, color, size, emit) => {
-      context.beginPath();
-      context.rect(x1, y1, x0 - x1, y0 - y1);
-      context.strokeStyle = color;
-      context.lineWidth = 2 * (size / 100);
-      context.stroke();
-      const w = canvas.width;
-      const h = canvas.height;
+  const drawCircle = (x0, y0, x1, y1, color, size, emit) => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
 
-      if (emit) {
-        socket.emit("drawing", {
-          x0: x0 / w,
-          y0: y0 / h,
-          x1: x1 / w,
-          y1: y1 / h,
-          color,
-          size,
-          shape: shapeDr,
-          roomID: roomID,
-        });
-      }
-    };
+    const radius = Math.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2) / 2;
+    context.beginPath();
+    context.arc((x0 + x1) / 2, (y0 + y1) / 2, radius, 0, 2 * 3.14);
+    context.strokeStyle = color;
+    context.lineWidth = 2 * (size / 100);
+    context.stroke();
 
-    const drawCircle = (x0, y0, x1, y1, color, size, emit) => {
-      const radius = Math.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2) / 2;
-      context.beginPath();
-      context.arc((x0 + x1) / 2, (y0 + y1) / 2, radius, 0, 2 * 3.14);
-      context.strokeStyle = color;
-      context.lineWidth = 2 * (size / 100);
-      context.stroke();
+    const w = canvas.width;
+    const h = canvas.height;
+    if (emit) {
+      saveToCurrentPage({ x0, y0, x1, y1, color, size, shape, roomID });
+      socket.emit("drawing", {
+        x0: x0 / w,
+        y0: y0 / h,
+        x1: x1 / w,
+        y1: y1 / h,
+        color,
+        size,
+        shape: shape,
+        roomID: roomID,
+      });
+    }
+  };
+  const loadPage = (index) => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
 
-      const w = canvas.width;
-      const h = canvas.height;
-      if (emit) {
-        socket.emit("drawing", {
-          x0: x0 / w,
-          y0: y0 / h,
-          x1: x1 / w,
-          y1: y1 / h,
-          color,
-          size,
-          shape: shapeDr,
-          roomID: roomID,
-        });
-      }
-    };
-
-    const clearCanvas = (emit) => {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      setIsDropdownOpen1(false);
-      setIsDropdownOpen2(false);
-      setIsDropdownOpen3(false);
-      setIsDropdownOpen4(false);
-      setSelectedColor1("black");
-      setZoomLevel(100);
-      setZoomLevel1(100);
-      setZoomLevel2(100);
-      setZoomLevel3(100);
-      if (emit) {
-        socket.emit("clearCanvas", { roomID: roomID });
-      }
-    };
-    clearCanvasButtonRef.current.addEventListener("click", () =>
-      clearCanvas(true)
-    );
-
-    boardDownloadButtonRef.current.addEventListener("click", () => {
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      const image = canvas.toDataURL("image/png", 1.0);
-      const link = document.createElement("a");
-      link.download = "my-image.png";
-      link.href = image;
-      link.click();
-    });
-
-    // ---------------- mouse movement --------------------------------------
-
-    const onMouseDown = (e) => {
-      notoggleDropdown();
-      drawing = true;
-      current.x = e.clientX || e.touches[0].clientX;
-      current.y = e.clientY || e.touches[0].clientY;
-      current.x1 = e.clientX || e.touches[0].clientX;
-      current.y1 = e.clientY || e.touches[0].clientY;
-    };
-
-    const onMouseMove = (e) => {
-      if (!drawing) {
-        return;
-      }
-      if (shapeDr === "pen" || shapeDr === "eraser") {
-        drawLine(
-          current.x,
-          current.y,
-          e.clientX || e.touches[0].clientX,
-          e.clientY || e.touches[0].clientY,
-          colorPen,
-          zoomval,
-          true
-        );
-      }
-      current.x = e.clientX || e.touches[0].clientX;
-      current.y = e.clientY || e.touches[0].clientY;
-    };
-
-    const onMouseUp = (e) => {
-      console.log(shapeDr);
-      if (!drawing) {
-        return;
-      }
-
-      drawing = false;
-      if (shapeDr === "pen" || shapeDr === "eraser") {
-        drawLine(
-          current.x,
-          current.y,
-          e.clientX || e.touches[0].clientX,
-          e.clientY || e.touches[0].clientY,
-          colorPen,
-          zoomval,
-          true
-        );
-      } else if (shapeDr === "line") {
-        drawLine(
-          current.x1,
-          current.y1,
-          e.clientX || e.touches[0].clientX,
-          e.clientY || e.touches[0].clientY,
-          colorPen,
-          zoomval,
-          true
-        );
-      } else if (shapeDr === "rectangle") {
-        drawRectangle(
-          current.x1,
-          current.y1,
-          e.clientX || e.touches[0].clientX,
-          e.clientY || e.touches[0].clientY,
-          colorPen,
-          zoomval,
-          true
-        );
-      } else if (shapeDr === "circle") {
-        drawCircle(
-          current.x1,
-          current.y1,
-          e.clientX || e.touches[0].clientX,
-          e.clientY || e.touches[0].clientY,
-          colorPen,
-          zoomval,
-          true
-        );
-      }
-    };
-
-    // ----------- limit the number of events per second -----------------------
-
-    const throttle = (callback, delay) => {
-      let previousCall = new Date().getTime();
-      return function () {
-        const time = new Date().getTime();
-
-        if (time - previousCall >= delay) {
-          previousCall = time;
-          callback.apply(null, arguments);
-        }
-      };
-    };
-
-    // -----------------add event listeners to our canvas ----------------------
-
-    canvas.addEventListener("mousedown", onMouseDown, false);
-    canvas.addEventListener("mouseup", onMouseUp, false);
-    canvas.addEventListener("mouseout", onMouseUp, false);
-    canvas.addEventListener("mousemove", throttle(onMouseMove, 5), false);
-
-    // Touch support for mobile devices
-    // canvas.addEventListener('touchstart', onMouseDown, false);
-    // canvas.addEventListener('touchend', onMouseUp, false);
-    // canvas.addEventListener('touchcancel', onMouseUp, false);
-    // canvas.addEventListener('touchmove', throttle(onMouseMove, 5), false);
-
-    // -------------- make the canvas fill its parent component -----------------
-
-    const onResize = () => {
-      // get canvas image data
-      const data = context.getImageData(0, 0, canvas.width, canvas.height);
-      canvas.width = bsize.current.offsetWidth;
-      canvas.height = bsize.current.offsetHeight;
-      context.fillStyle = "white";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-
-      // resize the data and draw it back
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (pages[index] === undefined) {
+      alert("Page not found");
+      return;
+    }
+    pages[index].forEach((data) => {
       console.log(data);
-      context.putImageData(data, 0, 0);
-    };
-
-    window.addEventListener("resize", onResize, false);
-    onResize();
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    // ----------------------- socket.io connection ----------------------------
-    const onDrawingEvent = (data) => {
-      if (data.roomID !== roomID) return;
-      const w = canvas.width;
-      const h = canvas.height;
-
       if (data.shape === "pen" || data.shape === "eraser") {
         drawLine(
-          data.x0 * w,
-          data.y0 * h,
-          data.x1 * w,
-          data.y1 * h,
+          data.x0,
+          data.y0,
+          data.x1,
+          data.y1,
           data.color,
-          data.size
+          data.size,
+          false
         );
       } else if (data.shape === "line") {
         drawLine(
-          data.x0 * w,
-          data.y0 * h,
-          data.x1 * w,
-          data.y1 * h,
+          data.x0,
+          data.y0,
+          data.x1,
+          data.y1,
           data.color,
-          data.size
+          data.size,
+          false
         );
       } else if (data.shape === "rectangle") {
         drawRectangle(
-          data.x0 * w,
-          data.y0 * h,
-          data.x1 * w,
-          data.y1 * h,
+          data.x0,
+          data.y0,
+          data.x1,
+          data.y1,
           data.color,
-          data.size
+          data.size,
+          false
         );
       } else if (data.shape === "circle") {
         drawCircle(
-          data.x0 * w,
-          data.y0 * h,
-          data.x1 * w,
-          data.y1 * h,
+          data.x0,
+          data.y0,
+          data.x1,
+          data.y1,
           data.color,
-          data.size
+          data.size,
+          false
         );
       }
-    };
+    });
+  };
+  const onMouseDown = (e) => {
+    drawing = true;
+    current.x = e.nativeEvent.offsetX || e.touches[0].clientX;
+    current.y = e.nativeEvent.offsetY || e.touches[0].clientY;
+    current.x1 = e.nativeEvent.offsetX || e.touches[0].clientX;
+    current.y1 = e.nativeEvent.offsetY || e.touches[0].clientY;
+  };
 
-    socket.on("boardDrawing", onDrawingEvent);
+  const onMouseMove = (e) => {
+    if (!drawing) {
+      return;
+    }
+    if (shape === "pen") {
+      drawLine(
+        current.x,
+        current.y,
+        e.nativeEvent.offsetX || e.touches[0].clientX,
+        e.nativeEvent.offsetY || e.touches[0].clientY,
+        colour,
+        size,
+        true
+      );
+    } else if (shape === "eraser") {
+      drawLine(
+        current.x,
+        current.y,
+        e.nativeEvent.offsetX || e.touches[0].clientX,
+        e.nativeEvent.offsetY || e.touches[0].clientY,
+        "white",
+        size,
+        true
+      );
+    }
+    current.x = e.nativeEvent.offsetX || e.touches[0].clientX;
+    current.y = e.nativeEvent.offsetY || e.touches[0].clientY;
+  };
+  const throttle = (callback, delay) => {
+    let previousCall = new Date().getTime();
+    return function () {
+      const time = new Date().getTime();
+
+      if (time - previousCall >= delay) {
+        previousCall = time;
+        callback.apply(null, arguments);
+      }
+    };
+  };
+  const onMouseUp = (e) => {
+    console.log(shape);
+    if (!drawing) {
+      return;
+    }
+
+    drawing = false;
+    if (shape === "pen" || shape === "eraser") {
+      drawLine(
+        current.x,
+        current.y,
+        e.nativeEvent.offsetX || e.touches[0].clientX,
+        e.nativeEvent.offsetY || e.touches[0].clientY,
+        colour,
+        size,
+        true
+      );
+    } else if (shape === "line") {
+      drawLine(
+        current.x1,
+        current.y1,
+        e.nativeEvent.offsetX || e.touches[0].clientX,
+        e.nativeEvent.offsetY || e.touches[0].clientY,
+        colour,
+        size,
+        true
+      );
+    } else if (shape === "rectangle") {
+      drawRectangle(
+        current.x1,
+        current.y1,
+        e.nativeEvent.offsetX || e.touches[0].clientX,
+        e.nativeEvent.offsetY || e.touches[0].clientY,
+        colour,
+        size,
+        true
+      );
+    } else if (shape === "circle") {
+      drawCircle(
+        current.x1,
+        current.y1,
+        e.nativeEvent.offsetX || e.touches[0].clientX,
+        e.nativeEvent.offsetY || e.touches[0].clientY,
+        colour,
+        size,
+        true
+      );
+    }
+  };
+
+  const onMouseOut = (e) => {
+    onMouseUp(e);
+  };
+
+  const onDrawingEvent = (data) => {
+    if (data.roomID !== roomID) return;
+    const canvas = canvasRef.current;
+    const w = canvas.width;
+    const h = canvas.height;
+    data.x0 = data.x0 * w;
+    data.y0 = data.y0 * h;
+    data.x1 = data.x1 * w;
+    data.y1 = data.y1 * h;
+
+    saveToCurrentPage(data);
+
+    if (data.shape === "pen" || data.shape === "eraser") {
+      drawLine(data.x0, data.y0, data.x1, data.y1, data.color, data.size);
+    } else if (data.shape === "line") {
+      drawLine(data.x0, data.y0, data.x1, data.y1, data.color, data.size);
+    } else if (data.shape === "rectangle") {
+      drawRectangle(data.x0, data.y0, data.x1, data.y1, data.color, data.size);
+    } else if (data.shape === "circle") {
+      drawCircle(data.x0, data.y0, data.x1, data.y1, data.color, data.size);
+    }
+  };
+
+  const clearCanvas = (emit) => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const eraseCompletePage = (emit) => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    setPages((prev) => {
+      prev[currentPage] = [];
+      return prev;
+    });
+    if (!emit) return;
+    socket.emit("eraseCompletePage", {
+      roomID: roomID,
+    });
+  };
+
+  const addPage = () => {
+    let newPages = [...pages];
+    newPages.push([]);
+    setPages(newPages);
+    setCurrentPage(newPages.length - 1);
+    clearCanvas();
+
+    socket.emit("newPage", {
+      roomID: roomID,
+    });
+  };
+
+  const incrementPage = () => {
+    if (currentPage + 1 < pages.length) {
+      loadPage(currentPage + 1);
+      setCurrentPage(currentPage + 1);
+      socket.emit("incrementPage", {
+        roomID: roomID,
+      });
+    }
+  };
+  const decrementPage = () => {
+    if (currentPage - 1 >= 0) {
+      loadPage(currentPage - 1);
+      setCurrentPage(currentPage - 1);
+      socket.emit("decrementPage", {
+        roomID: roomID,
+      });
+    }
+  };
+
+  const downloadPages = async () => {
+    let i = 0;
+
+    let pdf = new jsPDF("l", "mm", "a4");
+    let width = pdf.internal.pageSize.getWidth();
+    let height = pdf.internal.pageSize.getHeight();
+    const canvas = canvasRef.current;
+    while (i < pages.length) {
+      loadPage(i);
+      let data = canvas.toDataURL("image/png");
+
+      pdf.setPage(i + 1);
+      pdf.addImage(data, "PNG", 0, 0, width, height);
+      pdf.text(10, 10, `Page ${i + 1}`);
+      if (i !== pages.length - 1) pdf.addPage();
+      i++;
+    }
+    pdf.save("whiteboard.pdf");
+    loadPage(currentPage);
+  };
+
+  useEffect(() => {
+    socket.on("boardDrawing", (data) => {
+      onDrawingEvent(data);
+    });
     socket.on("clearCanvasListen", (data) => {
       if (data.roomID === roomID) clearCanvas(false);
     });
@@ -440,7 +395,44 @@ function Board({ socket }) {
       if (data.roomID !== roomID) return;
       toast.error(`${data.name} disconnected`);
     });
-  }, []);
+    socket.on("newPage", (data) => {
+      if (data.roomID !== roomID) return;
+      let newPages = [...pages];
+      newPages.push([]);
+      setPages(newPages);
+      setCurrentPage(newPages.length - 1);
+      clearCanvas();
+    });
+    socket.on("incrementPage", (data) => {
+      if (data.roomID !== roomID) return;
+      if (currentPage + 1 < pages.length) {
+        loadPage(currentPage + 1);
+        setCurrentPage(currentPage + 1);
+      }
+    });
+    socket.on("decrementPage", (data) => {
+      if (data.roomID !== roomID) return;
+      if (currentPage - 1 >= 0) {
+        loadPage(currentPage - 1);
+        setCurrentPage(currentPage - 1);
+      }
+    });
+
+    socket.on("eraseCompletePage", (data) => {
+      if (data.roomID !== roomID) return;
+      eraseCompletePage(false);
+    });
+
+    return () => {
+      socket.off("boardDrawing");
+      socket.off("clearCanvasListen");
+      socket.off("user-disconnected");
+      socket.off("newPage");
+      socket.off("incrementPage");
+      socket.off("eraseCompletePage");
+      socket.off("decrementPage");
+    };
+  }, [socket, roomID, pages, currentPage]);
 
   return (
     <div
@@ -453,172 +445,160 @@ function Board({ socket }) {
         <ToastContainer />
       </div>
       <div
-        ref={bsize}
-        id="container"
-        className="my-2 h-5/6 border-black border-2 mx"
+        className=" bg-slate-100 m-2 border-2 border-slate-400 rounded-lg"
+        style={{
+          height: "8%",
+        }}
+        id="tools"
       >
-        <canvas
-          style={{
-            zoom: `${zoomLevel}%`,
-          }}
-          id="canvas"
-          ref={canvasRef}
-          className="whiteboard "
-        />
+        <div className="h-full flex justify-evenly items-center w-full p-4">
+          {/* colour picker */}
+          <input
+            type="color"
+            value={colour}
+            onChange={(event) => {
+              setColour(event.target.value);
+            }}
+            className="h-12 w-16 rounded-sm "
+          />
+          {/* pen button fontawesome  */}
+          <button
+            className={
+              "btn  btn-info m-2 w-20" +
+              (currentShape === "pen" ? " btn-active" : " btn-outline")
+            }
+            onClick={() => {
+              setCurrentShape("pen");
+              shape = "pen";
+            }}
+          >
+            <FontAwesomeIcon icon={faPencil} className="w-6 h-6" />
+          </button>
 
-        <div className="tools flex justify-center">
-          <div className="rest-tools">
-            <button
-              onClick={toggleDropdown1}
-              style={{ zoom: `${zoomLevel1}%`, color: selectedColor1 }}
-              type="button"
-              className={"pen-tools"}
+          {/* eraser button */}
+          <button
+            className={
+              "btn  btn-info m-2 w-20" +
+              (currentShape === "eraser" ? " btn-active" : " btn-outline")
+            }
+            onClick={() => {
+              setCurrentShape("eraser");
+              shape = "eraser";
+            }}
+          >
+            <FontAwesomeIcon icon={faEraser} className="w-6 h-6 " />
+          </button>
+          {/* rectangle button */}
+          <button
+            className={
+              "btn  btn-info m-2 w-20" +
+              (currentShape === "rectangle" ? " btn-active" : " btn-outline")
+            }
+            onClick={() => {
+              setCurrentShape("rectangle");
+              shape = "rectangle";
+            }}
+          >
+            <FontAwesomeIcon icon={faSquare} className="w-6 h-6 " />
+          </button>
+          {/* circle */}
+          <button
+            className={
+              "btn  btn-info m-2 w-20" +
+              (currentShape === "circle" ? " btn-active" : " btn-outline")
+            }
+            onClick={() => {
+              setCurrentShape("circle");
+              shape = "circle";
+            }}
+          >
+            <FontAwesomeIcon icon={faCircle} className="w-6 h-6 " />
+          </button>
+          {/* line */}
+          <button
+            className={
+              "btn  btn-info m-2 w-20" +
+              (currentShape === "line" ? " btn-active" : " btn-outline")
+            }
+            onClick={() => {
+              setCurrentShape("line");
+              shape = "line";
+            }}
+          >
+            <FontAwesomeIcon icon={faMinus} className="w-6 h-6 " />
+          </button>
+          <div className="dropdown dropdown-bottom">
+            <label
+              tabIndex={0}
+              className="btn btn-outline m-1 bg-slate-50 w-20 text-black normal-case"
             >
-              <FontAwesomeIcon
-                icon={faPencil}
-                className={
-                  currentShape === "pen" ? "bg-gray-400 p-2 rounded-lg" : ""
-                }
-              />
-            </button>
-            {isDropdownOpen1 && (
-              <div className="dropdown-content pen">
-                <input
-                  type="range"
-                  min="50"
-                  max="200"
-                  value={zoomLevel1}
-                  onChange={handleZoomChange1}
-                  id="penWidth"
-                />
-                <div className="colors">
-                  <button
-                    onClick={() => handleColorChange1("black")}
-                    style={{ backgroundColor: "black" }}
-                  ></button>
-                  <button
-                    onClick={() => handleColorChange1("#f5314b")}
-                    style={{ backgroundColor: "#f5314b" }}
-                  ></button>
-                  <button
-                    onClick={() => handleColorChange1("cyan")}
-                    style={{ backgroundColor: "cyan" }}
-                  ></button>
-                  <button
-                    onClick={() => handleColorChange1("#31f58c")}
-                    style={{ backgroundColor: "#31f58c" }}
-                  ></button>
-                  <button
-                    onClick={() => handleColorChange1("#f5c131")}
-                    style={{ backgroundColor: "#f5c131" }}
-                  ></button>
-                  <button
-                    onClick={() => handleColorChange1("#3e31f5")}
-                    style={{ backgroundColor: "#3e31f5" }}
-                  ></button>
-                </div>
-              </div>
-            )}
-            <button
-              onClick={toggleDropdown2}
-              style={{ zoom: `${zoomLevel2}%` }}
-              type="button"
-              className="pen-tools"
+              Size
+            </label>
+            <select
+              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              style={{ cursor: "pointer" }}
+              onChange={(event) => {
+                setSize(event.target.value * 20);
+              }}
             >
-              <FontAwesomeIcon
-                icon={faEraser}
-                className={
-                  currentShape === "eraser" ? "bg-gray-400 rounded-lg p-2" : ""
-                }
-              />
-            </button>
-            {isDropdownOpen2 && (
-              <div className="dropdown-content eraser">
-                <input
-                  type="range"
-                  min="50"
-                  max="200"
-                  value={zoomLevel2}
-                  onChange={handleZoomChange2}
-                />
-              </div>
-            )}
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="8">8</option>
+              <option value="16">16</option>
+            </select>
+          </div>
+
+          {/* clear canvas */}
+          <button
+            onClick={() => {
+              eraseCompletePage(true);
+            }}
+            className="btn btn-outline btn-error w-20 m-2"
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </button>
+
+          {/* pages */}
+          <div className="flex flex-row">
             <button
-              onClick={toggleDropdown3}
-              style={{ zoom: `${zoomLevel3}%` }}
-              type="button"
-              className="pen-tools"
+              onClick={decrementPage}
+              className="btn btn-outline btn-primary w-16 m-2"
             >
-              <FontAwesomeIcon icon={faShapes} />
+              <FontAwesomeIcon icon={faBackward} />
             </button>
-            {isDropdownOpen3 && (
-              <div className={"dropdown-content shapes"}>
-                {/* three different shapes to chose pen, rectangle, circle */}
-                <button
-                  onClick={() => {
-                    shapeDr = "line";
-                    colorPen = colorPen === "white" ? "black" : colorPen;
-                    zoomval = 100;
-                    setCurrentShape("line");
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faMinus}
-                    className={
-                      currentShape === "line"
-                        ? "bg-gray-400 p-2 rounded-lg"
-                        : ""
-                    }
-                  />
-                </button>
-                <button
-                  onClick={() => {
-                    shapeDr = "rectangle";
-                    colorPen = colorPen === "white" ? "black" : colorPen;
-                    zoomval = 100;
-                    setCurrentShape("rectangle");
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faSquare}
-                    className={
-                      currentShape === "rectangle"
-                        ? "bg-gray-400 p-2 rounded-lg"
-                        : ""
-                    }
-                  />
-                </button>
-                <button
-                  onClick={() => {
-                    shapeDr = "circle";
-                    colorPen = colorPen === "white" ? "black" : colorPen;
-                    zoomval = 100;
-                    setCurrentShape("circle");
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faCircle}
-                    className={
-                      currentShape === "circle"
-                        ? "bg-gray-400 p-2 rounded-lg"
-                        : ""
-                    }
-                  />
-                </button>
-              </div>
-            )}
+            {/* current page / total pages */}
+            <div className="text-center m-auto font-bold text-black mx-4">
+              {currentPage + 1}/{pages.length}
+            </div>
 
             <button
-              ref={clearCanvasButtonRef}
-              type="button"
-              className="pen-tools"
+              onClick={incrementPage}
+              className="btn btn-outline btn-primary w-16 m-2"
             >
-              <FontAwesomeIcon icon={faTrash} />
+              <FontAwesomeIcon icon={faForward} />
             </button>
           </div>
+
+          {/* add page */}
+          <button
+            onClick={addPage}
+            className="btn btn-outline btn-success m-2 w-16 "
+          >
+            <FontAwesomeIcon icon={faPlus} className="h-5" />
+          </button>
         </div>
       </div>
-
+      <canvas
+        ref={canvasRef}
+        width={window.innerWidth * 0.65}
+        height={window.innerHeight * 0.72}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseMove={throttle(onMouseMove, 5)}
+        onMouseOut={onMouseOut}
+        className="border-2 border-slate-400 m-2 bg-white"
+      />
       <div className="flex justify-center items-center my-4">
         <button
           className="btn btn-outline btn-error mx-4 w-36"
@@ -633,7 +613,7 @@ function Board({ socket }) {
         <VoiceChat socket={socket} />
         <button
           className="btn btn-outline btn-info mx-4 w-40"
-          ref={boardDownloadButtonRef}
+          onClick={downloadPages}
         >
           Download <FontAwesomeIcon icon={faDownload} className="mx-1" />
         </button>

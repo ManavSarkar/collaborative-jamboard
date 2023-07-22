@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-daisyui";
 import { toast, ToastContainer } from "react-toastify";
-import { v4 as uuidv4 } from "uuid";
+import { nanoid } from "nanoid";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
@@ -9,27 +8,26 @@ function Body() {
   const [Id, setId] = useState("");
   // const [Username, setUsername] = useState("");
   const navigate = useNavigate();
+  const [editable, setEditable] = useState(true);
 
   const createRoom = (e) => {
     e.preventDefault();
-    setId(uuidv4());
-
+    let id = nanoid(10);
+    setId(id);
+    setEditable(false);
     toast.success("Link Created");
+    toast.success("Joining Room " + id);
+    setTimeout(() => {
+      joinRoom(id);
+    }, 3000);
   };
-  const joinRoom = () => {
-    if (!Id) {
+  const joinRoom = (id) => {
+    if (!Id && !id) {
       return toast.error("Join Id Required");
     }
-    // if (!Username) {
-    //   return toast.error("Username Required");
-    // }
-    // console.log(Username);
-    navigate(`/session/${Id}`, {
-      // state: {
-      //   username: Username,
-      //   roomID: Id,
-      // },
-    });
+    id = id || Id;
+
+    navigate(`/session/${id}`, {});
   };
   return (
     <div className="w-full min-h-screen bg-slate-50 flex justify-center items-center">
@@ -37,7 +35,7 @@ function Body() {
         <ToastContainer />
       </div>
 
-      <div className="card w-96  shadow-xl ">
+      <div className="card w-fit  shadow-xl ">
         <div className="card-body">
           <h2 className="card-title my-2 text-black">Session is here!</h2>
 
@@ -47,26 +45,48 @@ function Body() {
             className="input input-bordered w-full max-w-xs my-1 bg-slate-200 text-black"
             onChange={(e) => setId(e.target.value)}
             value={Id}
+            readOnly={!editable}
           />
-          {/* <input
-            type="text"
-            placeholder="Type here"
-            className="input input-bordered w-full max-w-xs my-1 bg-slate-200 text-black"
-            onChange={(e) => setUsername(e.target.value)}
-            value={Username}
-          /> */}
-          <div className="card-actions justify-end">
-            <button className="btn btn-primary my-4" onClick={joinRoom}>
-              Join here
+          <div className="card-actions justify-center">
+            <button
+              className="btn btn-primary my-4"
+              onClick={() => {
+                if (editable) {
+                  joinRoom();
+                }
+              }}
+            >
+              {editable ? "Join Session" : "Joining"}
+              {/* loading icon */}{" "}
+              <svg
+                className={`animate-spin h-5 w-5 ${
+                  editable ? "hidden" : "inline-block"
+                } text-white`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12z"
+                ></path>
+              </svg>
             </button>
+            {editable ? (
+              <button className="btn btn-primary my-4" onClick={createRoom}>
+                Create New Session
+              </button>
+            ) : null}
           </div>
-
-          <Link
-            className="link link-primary flex justify-end"
-            onClick={createRoom}
-          >
-            Create New Session
-          </Link>
         </div>
       </div>
     </div>
