@@ -47,6 +47,18 @@ chatSocket(io);
 jamboardSocket(io);
 voiceChatSocket(io);
 
+chatSocket(io);
+jamboardSocket(io);
+voiceChatSocket(io);
+
+io.on("connection", (socket) => {
+  console.log("SOCKET CONNECTED:", socket.id);
+
+  socket.on("disconnect", (reason) => {
+    console.log("SOCKET DISCONNECTED:", socket.id, reason);
+  });
+});
+
 app.use("/api/user", userRouter);
 app.use("/api/jamboard", jamboardRouter);
 
