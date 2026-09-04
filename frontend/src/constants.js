@@ -1,13 +1,13 @@
 if (process.env.NODE_ENV === "production") {
   module.exports = {
-    SOCKET_URL: "https://jamboard-backend.onrender.com",
-    REGISTER_URL: "https://jamboard-backend.onrender.com/api/user/register",
+    SOCKET_URL: "https://collaborative-jamboard-backend.vercel.app",
+    REGISTER_URL: "https://collaborative-jamboard-backend.vercel.app/api/user/register",
     CHECK_AUTH_URL:
-      "https://jamboard-backend.onrender.com/api/user/checkloggedin",
-    LOGIN_URL: "https://jamboard-backend.onrender.com/api/user/login",
+      "https://collaborative-jamboard-backend.vercel.app/api/user/checkloggedin",
+    LOGIN_URL: "https://collaborative-jamboard-backend.vercel.app/api/user/login",
     CREATE_SESSION_URL:
-      "https://jamboard-backend.onrender.com/api/jamboard/create",
-    LOGOUT_URL: "https://jamboard-backend.onrender.com/api/user/logout",
+      "https://collaborative-jamboard-backend.vercel.app/api/jamboard/create",
+    LOGOUT_URL: "https://collaborative-jamboard-backend.vercel.app/api/user/logout",
   };
 } else {
   module.exports = {
